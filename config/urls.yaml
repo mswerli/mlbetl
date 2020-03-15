@@ -1,0 +1,39 @@
+urls:
+  team: http://lookup-service-prod.mlb.com/json/named.team_all_season.bam?all_star_sw='N'&sort_order=name_asc
+  roster_40: http://lookup-service-prod.mlb.com/json/named.roster_40.bam?
+  roster_past: http://lookup-service-prod.mlb.com/json/named.roster_team_alltime.bam?'
+  transaction: http://lookup-service-prod.mlb.com/json/named.transaction_all.bam?sport_code='mlb'
+  player: http://lookup-service-prod.mlb.com/json/named.player_info.bam?sport_code='mlb'
+  atbat: https://baseballsavant.mlb.com/statcast_search/csv?all=true&hfPT=&hfAB=&hfBBT=&hfPR=&hfZ=&stadium=&hfBBL=&hfNewZones=&hfGT=R%7C&hfC=&hfSea={hfSea}&hfSit=&player_type=&hfOuts=&opponent=&pitcher_throws=&batter_stands=&hfSA=&game_date_gt={game_date_gt}&game_date_lt={game_date_lt}&team={team}&position=&hfRO=&home_road=&hfFlag=&metric_1=&hfInn=&min_pitches=0&min_results=0&group_by=name&sort_col=pitches&player_event_sort=h_launch_speed&sort_order=desc&min_abs=0&type=details&
+format:
+  team: json
+  roster_40: json
+  roster_past: json
+  transaction: json
+  player: json
+  atbat: csv
+tables:
+  team:
+    schema: league
+    table: teams
+  roster_40:
+    schema: rosters
+    table: roster_40
+  roster_past:
+    schema: rosters
+    table: historical_rosters
+  transaction:
+    schema: rosters
+    table: transactions
+  player:
+    schema: rosters
+    table: players
+  play_by_play:
+    schema: league
+    table: play_by_play
+
+
+
+
+
+

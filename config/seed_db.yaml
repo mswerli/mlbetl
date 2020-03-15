@@ -1,0 +1,29 @@
+include:
+  team :
+    season: ['2019']
+  roster_40:
+    team_id: ['ALL']
+  transaction:
+    start_date: 2017-01-01
+    end_date: 2020-02-10
+  roster_past:
+    team_id: ['ALL']
+    start_season: 2017
+    end_season: 2019
+  player:
+    player_id: ['ALL']
+  atbat:
+    hfSea: [2019]
+    team: ['All']
+    game_date_gt: ''
+    game_date_lt: ''
+output:
+  local:
+    dir: temp_data/
+    locations:
+      team: team/
+      roster_40: roster_40/
+      roster_past: roster_past/
+      transaction: transaction/
+      player: player/
+      atbat: atbat/
