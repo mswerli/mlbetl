@@ -24,6 +24,7 @@ class player(file_reader,postgres_table, url_factory):
         self.roster_ids = self.get_roster_ids()
         self.ids = set(self.roster_ids) - set(self.existing_ids)
         self.request_urls = self.create_urls()
+        self.steps = self.config['steps'][self.table]
 
     def create_urls(self, ids=None):
 
@@ -42,9 +43,16 @@ class player(file_reader,postgres_table, url_factory):
 
        return roster_ids
 
-
-
-    def populate_table(self, load_type):
+    def populate_table(self, load_type, load_method):
 
         df = self.read_all_type_files(self.table)
         self.transform_and_load(df, load_type=load_type)
+
+    def execute_steps(self):
+
+        if 'extract' in self.steps.keys():
+            self.make_all_requests()
+
+        if 'load' in self.steps.keys():
+            self.populate_table(load_type=self.steps['load']['load_type'],
+                                load_method= self.steps['load']['load_method'])

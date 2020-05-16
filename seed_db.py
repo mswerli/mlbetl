@@ -3,7 +3,7 @@ from atBat import atBat
 from player import player
 
 CONFIG = 'seed_db.yaml'
-DB_CONFIG = 'local_db.yaml'
+DB_CONFIG = 'do_db.yaml'
 FILE_STORE = 'local'
 
 
