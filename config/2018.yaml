@@ -1,0 +1,24 @@
+include:
+  atbat:
+    hfSea: [2018]
+    team: ['All']
+    game_date_gt: ''
+    game_date_lt: ''
+output:
+  local:
+    dir: temp_data/
+    locations:
+      atbat: atbat/
+##Steps define what gets run for each data type included
+steps:
+  atbat:
+    ##Will get data from API
+    ##Prescence of extract key within yaml entry is all thats needed
+    extract:
+      - true
+    ## Will load into table
+    load:
+      ##Will use psycopg2's copy_from method. Other option is df, which uses pandas df.to_sql method (much slower)
+      load_type: copy
+      ##Whether data should be appended
+      load_method: append

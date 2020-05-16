@@ -22,6 +22,7 @@ class loader(file_reader,postgres_table, url_factory):
         self.table = table
         self.create_urls = self.pick_url_method()
         self.request_urls = self.create_urls()
+        self.steps = self.config['steps'][self.table]
 
     def pick_url_method(self):
 
@@ -46,8 +47,20 @@ class loader(file_reader,postgres_table, url_factory):
         else:
             raise NotImplementedError('URL creation not implemented for %s', self.table)
 
-    def populate_table(self, load_type):
-
+    def populate_table(self, load_type, load_method):
         df = self.read_all_type_files(self.table)
         self.transform_and_load(df, load_type=load_type)
+
+    def execute_steps(self,):
+        if 'extract' in self.steps.keys():
+            self.make_all_requests()
+
+        if 'load' in self.steps.keys():
+            self.populate_table(load_type=self.steps['load']['load_type'],
+                                load_method=self.steps['load']['load_method'])
+
+
+
+
+
 

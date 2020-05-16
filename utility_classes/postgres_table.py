@@ -1,4 +1,5 @@
 import psycopg2 as pg
+from psycopg2.extras import  execute_batch
 import sqlalchemy as sql
 import yaml
 import pandas as pd
@@ -6,6 +7,7 @@ import numpy as np
 from sqlalchemy import  Integer, String, Unicode, Boolean, DateTime, Float ,Numeric
 import datetime
 import csv
+import tempfile
 
 
 class postgres_table:
@@ -18,23 +20,25 @@ class postgres_table:
         with open(r'config/urls.yaml') as file:
             self.urls = yaml.load(file, Loader=yaml.FullLoader)
 
-        with open(r'config/type_conversion.yaml') as file:
-            self.types = yaml.load(file, Loader=yaml.FullLoader)
+        #with open(r'config/type_conversion.yaml') as file:
+        #    self.types = yaml.load(file, Loader=yaml.FullLoader)
 
         with open(r'config/columns/teams.yaml') as file:
             self.columns = yaml.load(file, Loader=yaml.FullLoader)
 
         self.table = table
 
-        self.engine=sql.create_engine("postgresql+psycopg2://{}:{}@{}/{}"\
+        self.engine=sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}"\
             .format(db_config['user'],
                     db_config['password'],
                     db_config['host'],
+                    db_config['port'],
                     db_config['database']))
 
         self.conn = pg.connect(host=db_config['host'],
                                database=db_config['database'],
                                user=db_config['user'],
+                               port =  db_config['port'],
                                password = db_config['password'])
 
         self.col_type_query = """                              
@@ -84,7 +88,7 @@ class postgres_table:
         type_map = {
             "character varying": String(col_len),
             "bit": String(col_len),
-            "integer": Integer(),
+            "integer": Float(),
             "float": Float(),
             "boolean": Boolean(),
             "timestamp": DateTime()
@@ -241,7 +245,7 @@ class postgres_table:
         cursor.executemany(query, ids)
 
         self.conn.commit()
-        cursor.close
+        cursor.close()
 
     def write_to_database(self,df, method='append'):
 
@@ -254,6 +258,9 @@ class postgres_table:
                   index=False)
 
     def transform_and_load(self, df, load_method='append', load_type ='copy'):
+
+        if load_method == 'reload':
+            self.truncate_table()
 
         print(df.columns)
         df = df[self.schema['column_name']]
@@ -269,22 +276,34 @@ class postgres_table:
 
         cursor = self.conn.cursor()
 
-        values = df.to_numpy()
+        print('Converting to numpy')
 
-        replace_vals = self.urls['tables'][self.table]
-        replace_vals.update({'values':','.join(['%s'] * len(df.columns))})
+        #values = df.to_numpy()
+        filename = tempfile.mkstemp()
+        f = open(filename[1])
+        ##This is not ideal, but its the only way to get a copy command to work
+        ##There is something wrong with how data is read from the URL
+        df.to_csv(f.name, sep = '\t', index = False, na_rep = None)
+        print("converted")
 
-        query =  "INSERT INTO {schema}.{table} VALUES({values})"\
-            .format( **replace_vals)
+        #replace_vals = self.urls['tables'][self.table]
+        #print('Setting values to insert')
+        #replace_vals.update({'values': ','.join([ '%({})s'.format(a) for a in list(df.to_dict().keys())])})
 
-        cursor.executemany(query, values)
+        #query =  "INSERT INTO {schema}.{table} VALUES({values})"\
+        #   .format( **replace_vals)
+
+        #print('Running query')
+        next(f)
+        cursor.copy_from(f, table='league.play_by_play', sep='\t', null='None')
         self.conn.commit()
 
-        cursor.close()
+#        cursor.close()
 
     def copy_file_to_table(self, file, col_indexes = None):
 
         cursor = self.conn.cursor()
+        print(file)
 
         with open(file, 'r') as f:
             reader = csv.reader(f)
@@ -304,8 +323,6 @@ class postgres_table:
         cursor.executemany(query, data)
         self.conn.commit()
         cursor.close()
-
-
 
 
 
