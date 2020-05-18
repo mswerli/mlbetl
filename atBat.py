@@ -6,6 +6,9 @@ import time
 import requests
 import os
 
+##Handles requests and loading for stat cast/at bat data
+##Slightly more complicated than other entity classes
+
 
 class atBat(postgres_table, url_factory, file_reader):
 
@@ -141,8 +144,6 @@ class atBat(postgres_table, url_factory, file_reader):
         self.write_to_file_store(url_type='atBat',
                                  raw_data=req,
                                  file_name=file_name)
-
-
 
 
     def populate_table(self, load_method='append', load_type='copy', min_date=None, max_date=None):

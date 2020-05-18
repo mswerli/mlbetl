@@ -3,6 +3,10 @@ from utility_classes.postgres_table import postgres_table
 from utility_classes.url_factory import url_factory
 import yaml
 
+##Class used for handling extraction and loading of roster and team data
+##Contains instances of the url_factory, postgres_table, and file_reader
+##execute_steps method will run all steps defined in relevant sections of config
+
 
 class loader(file_reader,postgres_table, url_factory):
 

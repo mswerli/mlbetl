@@ -88,7 +88,7 @@ class postgres_table:
         type_map = {
             "character varying": String(col_len),
             "bit": String(col_len),
-            "integer": Float(),
+            "integer": Intger(),
             "float": Float(),
             "boolean": Boolean(),
             "timestamp": DateTime()
@@ -98,6 +98,8 @@ class postgres_table:
         return type_map[col]
 
     def map_sql_to_numpy(self, col):
+
+        ##Used to map data types from db tables to numpy/pandas
 
         type_map = {
             "character varying":np.character,
@@ -115,6 +117,9 @@ class postgres_table:
 
     def _del_csv_column(self, row, col_indexes):
 
+        ##remove user provided columns before inserting into db tables
+        ##not currently used
+
         col_indexes.sort()
         col_indexes.reverse
 
@@ -125,6 +130,7 @@ class postgres_table:
 
 
     def convert_all_data_type(self,df):
+        ##MParameterized method for data type conversion
 
         for a, b in zip(self.schema['column_name'], self.schema['data_type_long']):
 
@@ -137,15 +143,16 @@ class postgres_table:
                 df[a] = df[a].astype(self.map_sql_to_numpy(b))
 
             except:
+                ##Try to handle issues with integers and empyt/null/nan values
                 if b == 'integer':
                     df[a] = pd.to_numeric(df[a], errors = 'coerce')
                     #df[a] = df[a].astype(self.map_sql_to_numpy(b))
-
-
         return(df)
 
     def get_schema(self):
 
+        ##Called during initialization of class
+        ##Gets schema definition from database for relevant able
         query = self.col_type_query.format(self.urls['tables'][self.table]['schema'],
                                            self.urls['tables'][self.table]['table'])
 
@@ -165,6 +172,7 @@ class postgres_table:
         return schema
 
     def get_contraints(self):
+        #Get relevant constraints from DB
 
         query = self.primary_key_query.format(self.urls['tables'][self.table]['table'],
                                               self.urls['tables'][self.table]['schema'])
@@ -183,6 +191,9 @@ class postgres_table:
 
     def get_existing_ids(self, column_name=None):
 
+        ##Finds the existing primary keys in a table
+        ##Useful when the data we care about for one table is dictated by whats in another
+        ##Example of this is getting player data for players on rosters not currently in the players table
         if column_name is None:
             query = self.id_query.format(self.p_key['column_name'][0],
                                          self.p_key['constraint_schema'][0],
@@ -202,6 +213,8 @@ class postgres_table:
 
     def extract_new_ids(self,df):
 
+        ##Compares existing IDs to new data
+        ##Results in a df filtered down to only missing/needed data
         check_ids = set(df[self.p_key['column_name'][0]])
         present_ids = set(self.existing_ids)
 
@@ -212,6 +225,7 @@ class postgres_table:
         return df
 
     def truncate_table(self):
+        ##Runs a truncate query when doing full re-load of table
 
         query = "TRUNCATE TABLE {schema}.{table}".format( **self.urls['tables'][self.table])
 
@@ -219,6 +233,8 @@ class postgres_table:
 
     def remove_rows_in_date_range(self, date_col, min_date, max_date=None):
 
+        ##If dates are provided, ensures duplicates are inserted into table
+        ##Not currenlty used,but will be when running daily at bat data extraction
         if max_date is None:
             max_date = datetime.datetime.today()
 
@@ -232,6 +248,8 @@ class postgres_table:
 
     def remove_rows_with_id(self, id_col,ids):
 
+        ##Uses a primary key and values to remove rows from a table
+        ##Useful for determinig which player data to update based on transaction data
         cursor = self.conn.cursor()
 
         ids = tuple(ids)
@@ -248,6 +266,8 @@ class postgres_table:
         cursor.close()
 
     def write_to_database(self,df, method='append'):
+        ##Pandas method for inserting data to a database
+        ##Should only use as last resort, very slow
 
         print(len(df))
 
@@ -258,6 +278,9 @@ class postgres_table:
                   index=False)
 
     def transform_and_load(self, df, load_method='append', load_type ='copy'):
+        ##Method for running transform and load steps
+        ##Currently only transformation is removing columns not in table and converting data types
+        ##Remove
 
         if load_method == 'reload':
             self.truncate_table()
@@ -273,34 +296,25 @@ class postgres_table:
             self.write_to_database(df, load_method)
 
     def copy_df_to_table(self, df):
+        ##This method takes a pandas df, outputs a csv, then inserts with pyscopg2's copy_from command
+        ##Much faster than pandas to_sql
 
         cursor = self.conn.cursor()
-
-        print('Converting to numpy')
-
-        #values = df.to_numpy()
         filename = tempfile.mkstemp()
         f = open(filename[1])
+
         ##This is not ideal, but its the only way to get a copy command to work
         ##There is something wrong with how data is read from the URL
+
         df.to_csv(f.name, sep = '\t', index = False, na_rep = None)
-        print("converted")
-
-        #replace_vals = self.urls['tables'][self.table]
-        #print('Setting values to insert')
-        #replace_vals.update({'values': ','.join([ '%({})s'.format(a) for a in list(df.to_dict().keys())])})
-
-        #query =  "INSERT INTO {schema}.{table} VALUES({values})"\
-        #   .format( **replace_vals)
-
-        #print('Running query')
         next(f)
         cursor.copy_from(f, table='league.play_by_play', sep='\t', null='None')
         self.conn.commit()
-
-#        cursor.close()
+        cursor.close()
 
     def copy_file_to_table(self, file, col_indexes = None):
+        ##This is another implemenation of inerting data into tables
+        ##Faster than pandas, but still significantly slower than copy_from
 
         cursor = self.conn.cursor()
         print(file)

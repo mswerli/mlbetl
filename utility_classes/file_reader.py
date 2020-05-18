@@ -5,6 +5,8 @@ import itertools
 import pandas as pd
 
 
+##Class for reading file retrieved from APIs to pandas data-frames
+##In an ideal world, this is not needed and files would be directly inserted into DB via copy command
 
 class file_reader:
 
@@ -19,12 +21,14 @@ class file_reader:
         self.file_store = file_store
 
     def read_json(self, file_name):
+        #Read json file to a pandas data fream
 
         with open(file_name) as f:
             data=json.load(f)
 
         top_key = data.keys()
 
+        ##Depending on end point being used different logic needed for parsing json
         if data[list(top_key)[0]]['queryResults']['totalSize'] != '0':
             if data[list(top_key)[0]]['queryResults']['totalSize'] > '1':
 
@@ -47,6 +51,8 @@ class file_reader:
 
     def pick_file_reader(self, file_type):
 
+        ##Method for defining method to read in data
+
         if self.urls['format'][file_type] == 'csv':
             return self.read_csv
         elif self.urls['format'][file_type] == 'json':
@@ -55,6 +61,7 @@ class file_reader:
             NotImplementedError("File read method not defined")
 
     def read_all_type_files(self, file_type):
+        #Parameterizes appropriate method for reading files
 
         files = self.get_all_file_type_paths(file_type)
 
@@ -72,6 +79,7 @@ class file_reader:
 
     def get_all_file_type_paths(self, file_type):
 
+        ##Check output directory defined in config, gets a list of all files
         dir = self.config['output'][self.file_store]['dir']
         path = self.config['output'][self.file_store]['locations'][file_type]
         path = dir + path

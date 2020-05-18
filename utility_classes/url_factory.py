@@ -9,6 +9,10 @@ import urllib
 import csv
 
 
+##Class for genrating API request urls and executing requests
+##End points defined in configs/urls
+##ids argument can be used to store primary keys requests should be made for
+
 class url_factory:
 
     def __init__(self, config, file_store='local', ids=None):
@@ -38,6 +42,7 @@ class url_factory:
         self.ids = ids
 
     def _local_file_store_writer(self, raw_data, file_name):
+        ##Write Files locally
 
         dir_exists = os.path.isdir(self.config['output'][self.file_store]['dir']+self.table)
 
@@ -49,29 +54,25 @@ class url_factory:
 
         return file_name
 
-
-    def _s3_file_store_writer(self, file_type, file_name):
-
-       NotImplementedError('s3 backend')
-
     def _build_param(self, file_type, name, value):
+        ##Create url friendly parameters
+        ##Parameters come from data type section of config file
 
         param = "&" + name + "=" + "'" + value + "'"
 
         return (param)
 
     def get_file_store_method(self, file_store):
+        ##Eventually will support other locations for output files
 
         if file_store == 'local':
             return(self._local_file_store_writer)
-
-        elif file_store == 's3':
-            return(self._s3_file_store_writer)
 
         else:
             raise ValueError(file_store)
 
     def update_url(self, url_type, params):
+        ##For a given request, takes params provided and adds them to base url
 
         all_params=''
 
@@ -84,6 +85,10 @@ class url_factory:
         url = self.urls['urls'][url_type] + all_params
 
         return url
+
+    ### Next methods are data type specific
+    ### Have not found a way to generalize
+    ### Should think about whether to move these to specific classes
 
     def create_team_urls(self):
 
@@ -102,14 +107,13 @@ class url_factory:
 
         return urls
 
-
-
     def create_transaction_urls(self):
         start_date=self.config['include']['transaction']['start_date']
         end_date=self.config['include']['transaction']['end_date']
         duration = (end_date - start_date)
 
         if duration > datetime.timedelta(days=30):
+            ##Since there are lots of records returned for transactions, we need to chunk requests
             print(duration)
 
             interval_start = start_date
@@ -144,6 +148,8 @@ class url_factory:
         return urls
 
     def make_request(self, url, zzz=0):
+        ## Take a url generated above, send request
+        ## zzz argument will pause between requests to not overwhelm endpoints
 
         time.sleep(zzz)
         req = requests.get(url)
@@ -154,24 +160,11 @@ class url_factory:
 
         self.write_to_file_store(raw_data,file_name)
 
-
-    #def make_all_type_requests(self, url_type):
-
-     #   for a in self.request_urls[url_type]:
-     #      self.files[url_type].append(self.make_request(url_type,a,
-     #                                                     zzz=random.randint(5, 16) if url_type != 'at_bat' else random.randint(60, 120)))
-
     def make_all_requests(self):
 
         for url in self.request_urls:
             print(url)
             self.make_request(url)
-
- #   def run(self):
- #
- #       self.create_all_urls()
- #
- #       self.make_all_request()
 
 
 
