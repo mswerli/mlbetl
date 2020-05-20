@@ -1,0 +1,33 @@
+mlbapi:
+  base_url: http://statsapi.mlb.com/api/v1/
+  ##Required params explicitly names, optional rolled into {params}
+  teams:
+    template: teams
+  players:
+    teamplate: people?{personid}
+    params:
+      - personid
+  play_by_play:
+    template: game/{game_id}/playbyplay
+    params:
+      - game_id
+  transactions:
+    teamplate: transactions/{leagueid}&{date}
+    params:
+      - leagueId
+      - date
+  rosters:
+    template: teams/{teamid}/roster?season={season}
+    params:
+      - teamId
+      - season
+
+
+ ## build request
+        ## base url
+        ## If path is not null then add path
+        ## If path params is not null then add path params between / /
+        ## If sub-path is not null then add sub-path
+        ## If params is not null add ? and then key=value
+            ## Method for adding multiple params together
+
