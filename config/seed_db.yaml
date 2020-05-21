@@ -23,8 +23,6 @@ include:
   atbat:
     hfSea: [2019]
     team: ['All']
-    game_date_gt: ''
-    game_date_lt: ''
 ##Where to store csv and json data from API calls.
 output:
   local:

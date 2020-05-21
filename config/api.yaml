@@ -1,0 +1,46 @@
+apiMap:
+  team:
+    api: mlbapi
+  roster_40:
+    api: mlbapi
+  roster_past:
+    api: mlbapi
+  transaction:
+    api: mlbapi
+  player:
+    api: mlbapi
+  atbat:
+    api: savant
+mlbapi:
+  base: http://lookup-service-prod.mlb.com/json/named.
+  endpoints:
+    team:
+      template: team_all_season.bam?all_star_sw='N'&sort_order=name_asc
+      params:
+    roster_40:
+      template: roster_40.bam?
+      params:
+        - team_id
+    roster_past:
+      template: roster_team_alltime.bam?'
+      params:
+        - team_id
+        - start_season
+        - end_season
+    transaction:
+      template: transaction_all.bam?sport_code='mlb'
+      params:
+        - start_date
+        - end_date
+    player:
+      template: player_info.bam?sport_code='mlb'
+      params:
+        - player_id
+savant:
+  base: https://baseballsavant.mlb.com/
+  endpoints:
+    atbat:
+      template: statcast_search/csv?all=true
+      params:
+        - hfSea
+        - team
