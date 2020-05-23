@@ -1,16 +1,36 @@
 apiMap:
   team:
     api: mlbapi
+    format: json
+    team: team_id
   roster_40:
     api: mlbapi
+    format: json
+    team: team_id
   roster_past:
     api: mlbapi
+    format: json
+    team: team_id
   transaction:
     api: mlbapi
+    format: json
+    team: team_id
+    dates:
+      params: ['start_date','end_date']
+      format: interval
+      delim: ''
   player:
     api: mlbapi
+    format: json
+    team: team_id
   atbat:
     api: savant
+    format: csv
+    team: abbr
+    dates:
+      params: ['game_date_lt','game_date_gt']
+      format: interval
+      delim: ''
 mlbapi:
   base: http://lookup-service-prod.mlb.com/json/named.
   endpoints:
@@ -40,7 +60,9 @@ savant:
   base: https://baseballsavant.mlb.com/
   endpoints:
     atbat:
-      template: statcast_search/csv?all=true
+      template: statcast_search/csv?all=true&hfGT=R%7C&sort_col=pitches&player_event_sort=h_launch_speed&sort_order=desc&min_abs=0&type=details
       params:
         - hfSea
         - team
+
+

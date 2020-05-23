@@ -26,7 +26,7 @@ class parameter_constructor:
         ##Each dict is a set of a parameters for a request
         ##Checks to make sure all required parameters are present in each dict
 
-        api = self.endpoints['apiMap'][endpoint]
+        api = self.endpoints['apiMap'][endpoint]['api']
         endpoint_config = self.endpoints[api]['endpoints'][endpoint]
         required_params = endpoint_config['params']
 
@@ -35,11 +35,15 @@ class parameter_constructor:
             temp = [a for a in combination]
             new_dict = dict(pair for d in temp for pair in d.items())
 
-            all_params.append(new_dict)
+            param = '&'.join([k + '=' + str(v)\
+                              for k, v in zip(new_dict.keys(), new_dict.values())])
+
+            all_params.append(param)
+
 
         return all_params
 
-    def build_date_interval(self, start, end, days, delim='-'):
+    def build_date_interval(self, start, end, days=30, delim='-'):
 
         ##Takes a start date, end date, and an interval and creates date intervals
         ##append a list of dictionaries to the classes params method
@@ -54,17 +58,21 @@ class parameter_constructor:
             print(duration)
 
             interval_start = start
-            date_pairs=[]
+            start_dates = []
+            end_dates = []
             while interval_start < end:
-                start =  str(interval_start).replace('-','')
-                end = str(interval_start + datetime.timedelta(days)).replace('-',delim)
+                start_str =  str(interval_start).replace('-',delim)
+                end_str = str(interval_start + datetime.timedelta(days)).replace('-',delim)
 
-                date_pairs.append({'start_date':start, 'end_date':end})
+                start_dates.append(start_str)
+                end_dates.append(end_str)
+
+                #date_pairs.append({'start_date':start_str, 'end_date':end_str})
                 interval_start = interval_start + datetime.timedelta(days=days+1)
 
-            return date_pairs
+            return start_dates, end_dates
 
-    def built_date_range(self, start, end, delim):
+    def build_date_range(self, start, end, delim):
 
         ##Takes a start and an end date and generates string representations of each day inbetween
         ##Returs a list of dictionaries all with date as the key
