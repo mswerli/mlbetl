@@ -45,6 +45,14 @@ class config_class:
 
         return player_ids
 
+    def encode_hfsea(self, season):
+        ##the savant api has expects %7C to be appended to the season parameter
+        ##the simplest way of handling his is explicitly
+
+        season = str(season) + '%7C'
+
+        return season
+
     def get_team_ids(self, id_type='team_id'):
 
         ##Used to substitute All values for team_id in config files
@@ -66,6 +74,10 @@ class config_class:
             if type(parameters.get(key))  != list:
                 parameters.update({key: [parameters.get(key)]})
 
+            if key == 'hfSea':
+                ##This is an obnoxious one off, so I'm not going to solve for it beyond an if statement
+                parameters['hfSea'] = [self.encode_hfsea(sea) for sea in  parameters['hfSea']]
+
         needs_replacement = [k for k in parameters.keys() if parameters.get(k) in [['All'],['ALL']]]
 
         if 'team' in needs_replacement:
@@ -75,6 +87,7 @@ class config_class:
         if 'player_id' in needs_replacement:
             parameters['player_id'] = self.get_missing_player_ids()
 
+        dates = None
         if 'dates' in self.constructor.endpoints['apiMap'][endpoint].keys():
             date_params = self.constructor.endpoints['apiMap'][endpoint]['dates']['params']
             if all([ k in date_params for k in parameters.keys()]):
@@ -83,8 +96,10 @@ class config_class:
                     dates.append(parameters.get(p))
                 dates.sort()
 
+                del parameters[date_params[0]], parameters[date_params[1]]
+
                 if  self.constructor.endpoints['apiMap'][endpoint]['dates']['format'] == 'interval':
-                    parameters[date_params[0]], parameters[date_params[1]] = self.constructor.\
+                    dates = self.constructor. \
                         build_date_interval(start=dates[0][0], end=dates[1][0], days=30)
 
                 if  self.constructor.endpoints['apiMap'][endpoint]['dates']['format'] == 'range':
@@ -92,10 +107,15 @@ class config_class:
 
         output_parameters = []
         for key in parameters.keys():
-            output_parameters.append([{key:str(v)} for v in parameters[key]])
+            output_parameters.append([{key: str(v)} for v in parameters[key]])
 
         params = self.constructor.create_request_params(output_parameters,
                                                         endpoint)
+        if dates is not None:
+            if params != ['']:
+                params = [[param + date for param in params] for date in dates]
+            else:
+                params = dates
 
         return params
 
@@ -154,21 +174,3 @@ class config_class:
                     f.writelines(line + '\n')
         else:
             raise Exception(format + " format not supported")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

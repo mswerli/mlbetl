@@ -58,19 +58,16 @@ class parameter_constructor:
             print(duration)
 
             interval_start = start
-            start_dates = []
-            end_dates = []
+            date_pairs=[]
             while interval_start < end:
                 start_str =  str(interval_start).replace('-',delim)
                 end_str = str(interval_start + datetime.timedelta(days)).replace('-',delim)
 
-                start_dates.append(start_str)
-                end_dates.append(end_str)
 
-                #date_pairs.append({'start_date':start_str, 'end_date':end_str})
+                date_pairs.append('start_date=' + start_str +'&end_date='+end_str)
                 interval_start = interval_start + datetime.timedelta(days=days+1)
 
-            return start_dates, end_dates
+            return date_pairs
 
     def build_date_range(self, start, end, delim):
 
@@ -86,5 +83,6 @@ class parameter_constructor:
                       for n in range(0, days.days)]
 
         return date_range
+
 
 
