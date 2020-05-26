@@ -3,18 +3,22 @@ apiMap:
     api: mlbapi
     format: json
     team: team_id
+    sleep: 0
   roster_40:
     api: mlbapi
     format: json
     team: team_id
+    sleep: 0
   roster_past:
     api: mlbapi
     format: json
     team: team_id
+    sleep: 0
   transaction:
     api: mlbapi
     format: json
     team: team_id
+    sleep: 0
     dates:
       params: ['start_date','end_date']
       format: interval
@@ -23,10 +27,12 @@ apiMap:
     api: mlbapi
     format: json
     team: team_id
+    sleep: 0
   atbat:
     api: savant
     format: csv
     team: abbr
+    sleep: 30
     dates:
       params: ['game_date_lt','game_date_gt']
       format: interval

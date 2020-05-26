@@ -2,6 +2,7 @@ import yaml
 import psycopg2 as pg
 import sqlalchemy as sql
 from utility_classes.parmeter_constructor  import parameter_constructor
+from utility_classes.extract_step import extract_step
 import time
 import requests
 import os
@@ -80,9 +81,10 @@ class config_class:
 
         needs_replacement = [k for k in parameters.keys() if parameters.get(k) in [['All'],['ALL']]]
 
-        if 'team' in needs_replacement:
+        if 'team' in needs_replacement or 'team_id' in needs_replacement:
+            team_param = 'team_id' if 'team_id' in needs_replacement else 'team'
             id_type = self.constructor.endpoints['apiMap'][endpoint]['team']
-            parameters['team'] = self.get_team_ids(id_type)
+            parameters[team_param] = self.get_team_ids(id_type)
 
         if 'player_id' in needs_replacement:
             parameters['player_id'] = self.get_missing_player_ids()
@@ -99,8 +101,9 @@ class config_class:
                 del parameters[date_params[0]], parameters[date_params[1]]
 
                 if  self.constructor.endpoints['apiMap'][endpoint]['dates']['format'] == 'interval':
+                    delim = self.constructor.endpoints['apiMap'][endpoint]['dates']['delim']
                     dates = self.constructor. \
-                        build_date_interval(start=dates[0][0], end=dates[1][0], days=30)
+                        build_date_interval(start=dates[0][0], end=dates[1][0], days=30, delim=delim)
 
                 if  self.constructor.endpoints['apiMap'][endpoint]['dates']['format'] == 'range':
                     self.constructor.build_date_range(start=dates[0][0], end=dates[1][0])
@@ -135,42 +138,3 @@ class config_class:
 
             self.urls[ep].append(urls)
 
-
-    def make_requests(self, endpoint, zzz=0):
-
-        ##Make requests and save files
-
-        for url in self.urls[endpoint]:
-
-            response = requests.get(url)
-            file_name = url.replace('/','_')
-
-            if response.status_code != 200 & zzz != 0:
-                time.sleep(zzz)
-                response = requests.get(url)
-
-                if response.status_code != 200:
-                    raise Exception(url + ': Request failed' + response.status_code)
-
-            self.write_file(endpoint, response.content, file_name)
-            time.sleep(zzz)
-
-    def write_file(self, endpoint, raw_data, file_name):
-
-        dir_exists = os.path.isdir(self.config['output'][self.file_store]['dir'] + self.table)
-        format = self.endpoints['apiMap'][endpoint]['format']
-
-        if not dir_exists:
-            os.mkdir(self.config['output'][self.file_store]['dir']+self.table)
-
-        if format == 'json':
-            with open(file_name, 'w') as outfile:
-                    json.dump(raw_data, outfile)
-
-        elif format == 'csv':
-            decoded_content = raw_data.content.decode('utf-8')
-            with open(file_name, 'w', newline='\n') as f:
-                for line in decoded_content.splitlines():
-                    f.writelines(line + '\n')
-        else:
-            raise Exception(format + " format not supported")

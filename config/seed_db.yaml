@@ -25,12 +25,11 @@ include:
     team: ['All']
 ##Where to store csv and json data from API calls.
 output:
-  local:
-    dir: temp_data/
-    locations:
-      team: team/
-      roster_40: roster_40/
-      roster_past: roster_past/
-      transaction: transaction/
-      player: player/
-      atbat: atbat/
+  dir: temp_data/
+  locations:
+    team: team/
+    roster_40: roster_40/
+    roster_past: roster_past/
+    transaction: transaction/
+    player: player/
+    atbat: atbat/

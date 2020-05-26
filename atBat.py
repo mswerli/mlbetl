@@ -1,5 +1,5 @@
 from utility_classes.postgres_table import postgres_table
-from utility_classes.url_factory import url_factory
+from utility_classes.archive.url_factory import url_factory
 from utility_classes.file_reader import file_reader
 import urllib
 import time
