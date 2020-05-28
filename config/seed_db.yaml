@@ -20,9 +20,13 @@ include:
     player_id: ['ALL']
   ##Which seasons and teams to get at bat data for
   ##Can specify date ranges to narrow further
-  atbat:
-    hfSea: [2019]
-    team: ['All']
+#  atbat:
+#    hfSea: [2019]
+#    team: ['All']
+  schedule:
+    season: [2019]
+    startDate: 2019-03-01
+    endDate: 2019-10-05
 ##Where to store csv and json data from API calls.
 output:
   dir: temp_data/
@@ -33,3 +37,4 @@ output:
     transaction: transaction/
     player: player/
     atbat: atbat/
+    schedule: schedule/

@@ -26,6 +26,7 @@ apiMap:
   player:
     api: mlbapi
     format: json
+      json_path: player_info.queryResults.row[*]
     team: team_id
     sleep: 0
   atbat:
@@ -37,6 +38,20 @@ apiMap:
       params: ['game_date_lt','game_date_gt']
       format: interval
       delim: ''
+  playbyplay:
+    api: mlbstats
+    format: csv
+    sleep: 0
+  schedule:
+    api: mlbstats
+    format: json
+      json_path: dates[*].games[*]
+    sleep: 0
+    dates:
+      params: ['startDate','endDate']
+      format: interval
+      delim: '-'
+    data: ['dates','games']
 mlbapi:
   base: http://lookup-service-prod.mlb.com/json/named.
   endpoints:
@@ -70,5 +85,18 @@ savant:
       params:
         - hfSea
         - team
+mlbstats:
+  base: http://statsapi.mlb.com/api/v1/
+  endpoints:
+    playbyplay:
+      template: game/{game_pk}/playByPlay
+      pathParams:
+        - game_pk
+    schedule:
+      template: schedule/games/?sportId=1
+      params:
+       - season
+       - startDate
+       - endDate
 
 
