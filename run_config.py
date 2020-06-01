@@ -1,6 +1,6 @@
-from roster import loader
-from atBat import atBat
-from player import player
+from classes.archive.roster import loader
+from classes.archive.atBat import atBat
+from classes.archive.player import player
 import yaml
 
 CONFIG = '2018.yaml'

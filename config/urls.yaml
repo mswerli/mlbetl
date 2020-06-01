@@ -12,25 +12,7 @@ format:
   transaction: json
   player: json
   atbat: csv
-tables:
-  team:
-    schema: league
-    table: teams
-  roster_40:
-    schema: rosters
-    table: roster_40
-  roster_past:
-    schema: rosters
-    table: historical_rosters
-  transaction:
-    schema: rosters
-    table: transactions
-  player:
-    schema: rosters
-    table: players
-  play_by_play:
-    schema: league
-    table: play_by_play
+
 
 
 

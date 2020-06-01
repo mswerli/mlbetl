@@ -6,15 +6,16 @@ import json
 
 class extract_step:
 
-    def __init__(self, config, urls):
+    def __init__(self, config):
 
-        self.config=config
-        self.endpoints=config['include'].keys()
-        self.urls=urls
+        self.config_object = config
+        self.config=config.config
+        self.endpoints=self.config['include'].keys()
+        self.urls=config.urls
         with open('config/api.yaml') as file:
             self.api_map = yaml.load(file, Loader=yaml.FullLoader)
 
-        self.run_extract_steps()
+        self.run()
 
     def make_requests(self, endpoint, zzz=0):
 
@@ -61,7 +62,7 @@ class extract_step:
         else:
             raise Exception(format + " format not supported")
 
-    def run_extract_steps(self):
+    def run(self):
 
         for endpoint in self.endpoints:
             print(endpoint)

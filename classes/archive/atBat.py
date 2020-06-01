@@ -1,6 +1,6 @@
-from utility_classes.postgres_table import postgres_table
-from utility_classes.archive.url_factory import url_factory
-from utility_classes.file_reader import file_reader
+from classes.archive.postgres_table import postgres_table
+from classes.archive.url_factory import url_factory
+from classes.archive.file_reader import file_reader
 import urllib
 import time
 import requests

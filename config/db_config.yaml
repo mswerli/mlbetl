@@ -1,0 +1,29 @@
+tables:
+  team:
+    schema: league
+    table: teams
+    null_value: 'None'
+  roster_40:
+    schema: rosters
+    table: roster_40
+    null_value: 'None'
+  roster_past:
+    schema: rosters
+    table: historical_rosters
+    null_value: 'None'
+  transaction:
+    schema: rosters
+    table: transactions
+    null_value: 'None'
+  player:
+    schema: rosters
+    table: players
+    null_value: 'None'
+  play_by_play:
+    schema: league
+    table: play_by_play
+    null_value: 'None'
+  schedule:
+    schema: league
+    table: schedule
+    null_value: ''

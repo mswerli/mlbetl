@@ -1,18 +1,12 @@
 import yaml
-import psycopg2 as pg
 import sqlalchemy as sql
-from utility_classes.parmeter_constructor  import parameter_constructor
-from utility_classes.extract_step import extract_step
-import time
-import requests
-import os
-import json
-import datetime
+import pandas as pd
+from classes.parmeter_constructor  import parameter_constructor
 
 
 class config_class:
 
-    def __init__(self, config_file, db_config):
+    def __init__(self, config_file, db_config, tables):
 
         with open(config_file) as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
@@ -20,12 +14,30 @@ class config_class:
         with open(r'config/' + db_config) as file:
             db_config = yaml.load(file, Loader=yaml.FullLoader)
 
-        self.engine = sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}" \
-                                        .format(db_config['user'],
-                                                db_config['password'],
-                                                db_config['host'],
-                                                db_config['port'],
-                                                db_config['database']))
+        with open(r'config/' + tables) as file:
+            self.tables = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.engine=sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}"\
+            .format(db_config['user'],
+                    db_config['password'],
+                    db_config['host'],
+                    db_config['port'],
+                    db_config['database']))
+
+        self.col_type_query = """                              
+                            SELECT 
+                                column_name, 
+                                data_type, 
+                                ordinal_position,
+                                character_maximum_length,
+                                numeric_precision,
+                                udt_name,
+                                is_nullable
+                            FROM information_schema.columns
+                            WHERE table_schema='{}' and table_name='{}'
+                        """
+
+        self.schemas = {}
 
         self.constructor = parameter_constructor(endpoints = 'config/api.yaml')
 
@@ -34,6 +46,8 @@ class config_class:
         self.parameters = None
 
         self.urls = {ep:[] for ep in self.endpoints}
+
+        self.run_config()
 
     def get_missing_player_ids(self):
 
@@ -45,6 +59,27 @@ class config_class:
         player_ids = [a[0] for a in res.fetchall()]
 
         return player_ids
+
+    def get_schema(self):
+
+        for endpoint in self.endpoints:
+
+            query = self.col_type_query.format(self.tables['tables'][endpoint]['schema'],
+                                               self.tables['tables'][endpoint]['table'])
+
+            schema = self.engine.execute(query)\
+                .fetchall()
+
+            schema=pd.DataFrame.from_dict(schema) \
+                .rename(columns={0:'column_name',
+                         1:'data_type_long',
+                         2:'ordinal_position',
+                         3:'character_length',
+                         4:"numeric_precision",
+                         5:"data_type_short",
+                         6:"is_nullable"})
+
+            self.schemas[endpoint] = schema
 
     def encode_hfsea(self, season):
         ##the savant api has expects %7C to be appended to the season parameter
@@ -137,4 +172,9 @@ class config_class:
             urls = [base_url +  path + '&'+ params for params in parameters]
 
             self.urls[ep].append(urls)
+
+    def run_config(self):
+
+        self.generate_urls()
+        self.get_schema()
 
