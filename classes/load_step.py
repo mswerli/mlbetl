@@ -42,6 +42,10 @@ class load_step:
 
         self.engine.execute(query)
 
+    def refresh_missing_players(self):
+
+        self.engine.execute("REFRESH MATERIALIZED VIEW rosters.missing_players")
+
     def remove_rows_in_date_range(self, date_col, min_date, endpoint, max_date=None):
 
         if max_date is None:
@@ -95,6 +99,8 @@ class load_step:
                 self.truncate_table(ep)
 
             self.copy_file_to_table(ep)
+
+        self.refresh_missing_players()
 
 
 

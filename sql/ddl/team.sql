@@ -1,66 +1,61 @@
-CREATE TABLE IF NOT EXISTS league.teams(
-   phone_number         VARCHAR(30)
-  ,venue_name           VARCHAR(30)
-  ,franchise_code       VARCHAR(30)
-  ,all_star_sw          VARCHAR(30)
-  ,sport_code           VARCHAR(30)
-  ,address_city         VARCHAR(30)
-  ,city                 VARCHAR(30)
-  ,name_display_full    VARCHAR(30)
-  ,spring_league_abbrev VARCHAR(30)
-  ,time_zone_alt        VARCHAR(30)
-  ,sport_id             INTEGER
-  ,venue_id             INTEGER
-  ,mlb_org_id           INTEGER
-  ,time_zone_generic    VARCHAR(30)
-  ,mlb_org              VARCHAR(30)
-  ,last_year_of_play    INTEGER
-  ,league_full          VARCHAR(30)
-  ,home_opener_time     VARCHAR(30)
-  ,address_province     VARCHAR(30)
-  ,league_id            INTEGER
-  ,name_abbrev          VARCHAR(30)
-  ,bis_team_code        VARCHAR(30)
-  ,league               VARCHAR(30)
-  ,spring_league        VARCHAR(30)
-  ,base_url             VARCHAR(30)
-  ,address_zip          VARCHAR(30)
-  ,sport_code_display   VARCHAR(30)
-  ,mlb_org_short        VARCHAR(30)
-  ,time_zone            VARCHAR(30)
-  ,address_line1        VARCHAR(30)
-  ,mlb_org_brief        VARCHAR(30)
-  ,address_line2        VARCHAR(30)
-  ,season               INTEGER
-  ,address_line3        VARCHAR(30)
-  ,division_abbrev      VARCHAR(30)
-  ,name_display_short   VARCHAR(30)
-  ,team_id              INTEGER PRIMARY KEY
-  ,active_sw            VARCHAR(30)
-  ,address_intl         VARCHAR(30)
-  ,state                VARCHAR(30)
-  ,address_country      VARCHAR(30)
-  ,mlb_org_abbrev       VARCHAR(30)
-  ,division             VARCHAR(30)
-  ,team_code            VARCHAR(30)
-  ,name                 VARCHAR(30)
-  ,website_url          VARCHAR(30)
-  ,sport_code_name      VARCHAR(30)
-  ,first_year_of_play   INTEGER
-  ,league_abbrev        VARCHAR(30)
-  ,name_display_long    VARCHAR(30)
-  ,store_url            VARCHAR(30)
-  ,time_zone_text       VARCHAR(30)
-  ,name_short           VARCHAR(30)
-  ,home_opener          VARCHAR(30)
-  ,address_state        VARCHAR(30)
-  ,division_full        VARCHAR(30)
-  ,time_zone_num        INTEGER
-  ,spring_league_full   VARCHAR(30)
-  ,address              VARCHAR(30)
-  ,name_display_brief   VARCHAR(30)
-  ,file_code            VARCHAR(30)
-  ,division_id          INTEGER
-  ,spring_league_id     INTEGER
-  ,venue_short          VARCHAR(30)
+DROP TABLE IF EXISTS league.teams;
+CREATE TABLE league.teams (
+	venue_name text NULL,
+	franchise_code text NULL,
+	sport_code text NULL,
+	address_city text NULL,
+	city text NULL,
+	name_display_full text NULL,
+	spring_league_abbrev text NULL,
+	sport_id int4 NULL,
+	venue_id int4 NULL,
+	mlb_org_id int4 NULL,
+	mlb_org text NULL,
+	last_year_of_play int4 NULL,
+	league_full text NULL,
+	address_province text NULL,
+	league_id int4 NULL,
+	name_abbrev text NULL,
+	league text NULL,
+	spring_league text NULL,
+	base_url text NULL,
+	address_zip text NULL,
+	sport_code_display text NULL,
+	mlb_org_short text NULL,
+	time_zone text NULL,
+	address_line1 text NULL,
+	mlb_org_brief text NULL,
+	address_line2 text NULL,
+	season int4 NULL,
+	address_line3 text NULL,
+	division_abbrev text NULL,
+	name_display_short text NULL,
+	team_id int4 NOT NULL,
+	active_sw text NULL,
+	address_intl text NULL,
+	state text NULL,
+	address_country text NULL,
+	mlb_org_abbrev text NULL,
+	division text NULL,
+	team_code text NULL,
+	"name" text NULL,
+	website_url text NULL,
+	sport_code_name text NULL,
+	first_year_of_play int4 NULL,
+	league_abbrev text NULL,
+	name_display_long text NULL,
+	store_url text NULL,
+	time_zone_text text NULL,
+	name_short text NULL,
+	address_state text NULL,
+	division_full text NULL,
+	time_zone_num float8 NULL,
+	spring_league_full text NULL,
+	address text NULL,
+	name_display_brief text NULL,
+	file_code text NULL,
+	division_id int4 NULL,
+	spring_league_id int4 NULL,
+	venue_short text NULL,
+	CONSTRAINT teams_pkey PRIMARY KEY (team_id)
 );

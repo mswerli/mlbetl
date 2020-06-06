@@ -1,25 +1,27 @@
-CREATE TABLE rosters.historical_rosters(
-   name_first_last        VARCHAR(30)
-  ,weight                 INTEGER
-  ,primary_position       VARCHAR(30)
-  ,birth_date             VARCHAR(30)
-  ,throws                 VARCHAR(30)
-  ,stat_years             VARCHAR(30)
-  ,height_inches          INTEGER
-  ,name_sort              VARCHAR(30)
-  ,status_short           VARCHAR(30)
-  ,jersey_number          INTEGER
-  ,player_first_last_html VARCHAR(30)
-  ,bats                   VARCHAR(30)
-  ,primary_position_cd    VARCHAR(30)
-  ,position_desig         VARCHAR(30)
-  ,forty_man_sw           VARCHAR(30)
-  ,player_html            VARCHAR(30)
-  ,height_feet            INTEGER
-  ,player_id              INTEGER REFERENCES rosters.players(player_id)
-  ,name_last_first        VARCHAR(30)
-  ,current_sw             VARCHAR(30)
-  ,roster_years           VARCHAR(30)
-  ,team_id                INTEGER REFERENCES league.teams(team_id)
-  ,active_sw              VARCHAR(30)
-)
+DROP TABLE IF EXISTS rosters.historical_rosters;
+
+CREATE TABLE rosters.historical_rosters (
+	name_first_last text NULL,
+	weight int4 NULL,
+	primary_position text NULL,
+	birth_date date NULL,
+	throws text NULL,
+	stat_years text NULL,
+	height_inches int4 NULL,
+	name_sort text NULL,
+	status_short text NULL,
+	jersey_number int4 NULL,
+	player_first_last_html text NULL,
+	bats text NULL,
+	primary_position_cd text NULL,
+	position_desig text NULL,
+	forty_man_sw text NULL,
+	player_html text NULL,
+	height_feet int4 NULL,
+	player_id int4 NULL,
+	name_last_first text NULL,
+	current_sw text NULL,
+	roster_years text NULL,
+	team_id int4 NULL,
+	active_sw text NULL
+);

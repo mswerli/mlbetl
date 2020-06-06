@@ -3,293 +3,385 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d "$POSTGRES_DB"  <<-EOSQL
     DROP SCHEMA  IF EXISTS league CASCADE;
     DROP SCHEMA  IF EXISTS rosters CASCADE;
      CREATE SCHEMA league
-        AUTHORIZATION doadmin;
+        AUTHORIZATION postgres;
 
     CREATE SCHEMA rosters
-        AUTHORIZATION doadmin;
+        AUTHORIZATION postgres;
 
-    CREATE TABLE IF NOT EXISTS league.teams(
-       venue_name           text
-      ,franchise_code       text
-      ,sport_code           text
-      ,address_city         text
-      ,city                 text
-      ,name_display_full    text
-      ,spring_league_abbrev text
-      ,sport_id             INTEGER
-      ,venue_id             INTEGER
-      ,mlb_org_id           INTEGER
-      ,mlb_org              text
-      ,last_year_of_play    INTEGER
-      ,league_full          text
-      ,address_province     text
-      ,league_id            INTEGER
-      ,name_abbrev          text
-      ,league               text
-      ,spring_league        text
-      ,base_url             text
-      ,address_zip          text
-      ,sport_code_display   text
-      ,mlb_org_short        text
-      ,time_zone            text
-      ,address_line1        text
-      ,mlb_org_brief        text
-      ,address_line2        text
-      ,season               INTEGER
-      ,address_line3        text
-      ,division_abbrev      text
-      ,name_display_short   text
-      ,team_id              INTEGER PRIMARY KEY
-      ,active_sw            text
-      ,address_intl         text
-      ,state                text
-      ,address_country      text
-      ,mlb_org_abbrev       text
-      ,division             text
-      ,team_code            text
-      ,name                 text
-      ,website_url          text
-      ,sport_code_name      text
-      ,first_year_of_play   INTEGER
-      ,league_abbrev        text
-      ,name_display_long    text
-      ,store_url            text
-      ,time_zone_text       text
-      ,name_short           text
-      ,address_state        text
-      ,division_full        text
-      ,time_zone_num        INTEGER
-      ,spring_league_full   text
-      ,address              text
-      ,name_display_brief   text
-      ,file_code            text
-      ,division_id          INTEGER
-      ,spring_league_id     INTEGER
-      ,venue_short          text
-    );
-
-  CREATE TABLE rosters.players(
-     birth_country                text
-    ,name_prefix                  text
-    ,name_display_first_last      text
-    ,college                      text
-    ,height_inches                INTEGER
-    ,death_country                text
-    ,age                          INTEGER
-    ,name_display_first_last_html text
-    ,gender                       text
-    ,height_feet                  INTEGER
-    ,pro_debut_date               text
-    ,death_date                   text
-    ,primary_position             text
-    ,birth_date                   text
-    ,team_abbrev                  text
-    ,status                       text
-    ,name_display_last_first_html text
-    ,throws                       text
-    ,death_city                   text
-    ,primary_position_txt         text
-    ,high_school                  text
-    ,name_display_roster_html     text
-    ,name_use                     text
-    ,player_id                    INTEGER PRIMARY KEY
-    ,status_date                  text
-    ,primary_stat_type            text
-    ,team_id                      INTEGER
-    ,active_sw                    text
-    ,primary_sport_code           text
-    ,birth_state                  text
-    ,weight                       INTEGER
-    ,name_middle                  text
-    ,name_display_roster          text
-    ,end_date                     text
-    ,jersey_number                INTEGER
-    ,death_state                  text
-    ,name_first                   text
-    ,bats                         text
-    ,team_code                    text
-    ,birth_city                   text
-    ,name_nick                    text
-    ,status_code                  text
-    ,name_matrilineal             text
-    ,team_name                    text
-    ,name_display_last_first      text
-    ,twitter_id                   text
-    ,name_title                   text
-    ,file_code                    text
-    ,name_last                    text
-    ,start_date                   text
-    ,name_full                    text
-  );
-
-    CREATE TABLE rosters.roster_40(
-       position_txt            text
-      ,weight                  INTEGER
-      ,name_display_first_last text
-      ,college                 text
-      ,height_inches           INTEGER
-      ,starter_sw              text
-      ,jersey_number           INTEGER
-      ,end_date                date
-      ,name_first              text
-      ,bats                    text
-      ,team_code               text
-      ,height_feet             INTEGER
-      ,pro_debut_date          date
-      ,status_code             text
-      ,primary_position        text
-      ,birth_date              date
-      ,team_abbrev             text
-      ,throws                  text
-      ,team_name               text
-      ,name_display_last_first text
-      ,name_use                text
-      ,player_id               INTEGER
-      ,name_last               text
-      ,team_id                 INTEGER
-      ,start_date              text
-      ,name_full               text
-    );
-
-    CREATE TABLE rosters.historical_rosters(
-       name_first_last        text
-      ,weight                 INTEGER
-      ,primary_position       text
-      ,birth_date             date
-      ,throws                 text
-      ,stat_years             text
-      ,height_inches          INTEGER
-      ,name_sort              text
-      ,status_short           text
-      ,jersey_number          INTEGER
-      ,player_first_last_html text
-      ,bats                   text
-      ,primary_position_cd    text
-      ,position_desig         text
-      ,forty_man_sw           text
-      ,player_html            text
-      ,height_feet            INTEGER
-      ,player_id              INTEGER
-      ,name_last_first        text
-      ,current_sw             text
-      ,roster_years           text
-      ,team_id                INTEGER
-      ,active_sw              text
-    );
-
-    CREATE TABLE rosters.transactions(
-       trans_date_cd           text
-      ,from_team_id            INTEGER
-      ,orig_asset              text
-      ,final_asset_type        text
-      ,player                  text
-      ,resolution_cd           text
-      ,final_asset             text
-      ,name_display_first_last text
-      ,type_cd                 text
-      ,name_sort               text
-      ,resolution_date         text
-      ,conditional_sw          text
-      ,team                    text
-      ,"type"                    text
-      ,name_display_last_first text
-      ,transaction_id          INTEGER
-      ,trans_date              date
-      ,effective_date          date
-      ,player_id               INTEGER
-      ,orig_asset_type         text
-      ,from_team               text
-      ,team_id                 INTEGER
-      ,note                    text
-    );
-CREATE TABLE league.play_by_play
-(
-    pitch_type text COLLATE pg_catalog."default",
-    game_date date,
-    release_speed numeric(4,1),
-    release_pos_x numeric(7,4),
-    release_pos_z numeric(6,4),
-    player_name text COLLATE pg_catalog."default",
-    batter integer,
-    pitcher integer,
-    events text COLLATE pg_catalog."default",
-    description text COLLATE pg_catalog."default",
-    spin_dir text COLLATE pg_catalog."default",
-    spin_rate_deprecated numeric(7,4),
-    break_angle_deprecated numeric(7,4),
-    break_length_deprecated numeric(7,4),
-    zone numeric(3,0),
-    des text COLLATE pg_catalog."default",
-    game_type text COLLATE pg_catalog."default",
-    stand text COLLATE pg_catalog."default",
-    p_throws text COLLATE pg_catalog."default",
-    home_team text COLLATE pg_catalog."default",
-    away_team text COLLATE pg_catalog."default",
-    type text COLLATE pg_catalog."default",
-    hit_location numeric(7,4),
-    bb_type text COLLATE pg_catalog."default",
-    balls integer,
-    strikes integer,
-    game_year text COLLATE pg_catalog."default",
-    pfx_x numeric(7,4),
-    pfx_z numeric(6,4),
-    plate_x numeric(6,4),
-    plate_z numeric(6,4),
-    on_3b numeric(8,0),
-    on_2b numeric(8,0),
-    on_1b numeric(8,0),
-    outs_when_up integer,
-    inning integer,
-    inning_topbot text COLLATE pg_catalog."default",
-    hc_x numeric(6,2),
-    hc_y numeric(5,2),
-    tfs_deprecated text COLLATE pg_catalog."default",
-    tfs_zulu_deprecated text COLLATE pg_catalog."default",
-    fielder_2 numeric(8,0),
-    umpire text COLLATE pg_catalog."default",
-    sv_id text COLLATE pg_catalog."default",
-    vx0 numeric(6,4),
-    vy0 numeric(9,4),
-    vz0 numeric(7,4),
-    ax numeric(8,4),
-    ay numeric(7,4),
-    az numeric(8,4),
-    sz_top numeric(6,4),
-    sz_bot numeric(6,4),
-    hit_distance_sc numeric(7,4),
-    launch_speed numeric(5,1),
-    launch_angle numeric(4,1),
-    effective_speed numeric(7,4),
-    release_spin_rate numeric(6,2),
-    release_extension numeric(6,4),
-    game_pk integer,
-    fielder_3 numeric(8,0),
-    fielder_4 numeric(8,0),
-    fielder_5 numeric(8,0),
-    fielder_6 numeric(8,0),
-    fielder_7 numeric(8,0),
-    fielder_8 numeric(8,0),
-    fielder_9 numeric(8,0),
-    release_pos_y numeric(7,4),
-    estimated_ba_using_speedangle numeric(5,3),
-    estimated_woba_using_speedangle numeric(5,3),
-    woba_value numeric(4,2),
-    woba_denom numeric(5,3),
-    babip_value numeric(5,3),
-    iso_value numeric(5,3),
-    launch_speed_angle numeric(7,4),
-    at_bat_number integer,
-    pitch_number integer,
-    pitch_name text COLLATE pg_catalog."default",
-    home_score integer,
-    away_score integer,
-    bat_score integer,
-    fld_score integer,
-    post_away_score integer,
-    post_home_score integer,
-    post_bat_score integer,
-    post_fld_score integer,
-    if_fielding_alignment text COLLATE pg_catalog."default",
-    of_fielding_alignment text COLLATE pg_catalog."default"
+CREATE TABLE league.play_by_play (
+	pitch_type text NULL,
+	game_date date NULL,
+	release_speed float8 NULL,
+	release_pos_x float8 NULL,
+	release_pos_z float8 NULL,
+	player_name text NULL,
+	batter int4 NULL,
+	pitcher int4 NULL,
+	events text NULL,
+	description text NULL,
+	spin_dir text NULL,
+	spin_rate_deprecated float8 NULL,
+	break_angle_deprecated float8 NULL,
+	break_length_deprecated float8 NULL,
+	"zone" float8 NULL,
+	des text NULL,
+	game_type text NULL,
+	stand text NULL,
+	p_throws text NULL,
+	home_team text NULL,
+	away_team text NULL,
+	"type" text NULL,
+	hit_location float8 NULL,
+	bb_type text NULL,
+	balls int4 NULL,
+	strikes int4 NULL,
+	game_year text NULL,
+	pfx_x float8 NULL,
+	pfx_z float8 NULL,
+	plate_x float8 NULL,
+	plate_z float8 NULL,
+	on_3b float8 NULL,
+	on_2b float8 NULL,
+	on_1b float8 NULL,
+	outs_when_up int4 NULL,
+	inning int4 NULL,
+	inning_topbot text NULL,
+	hc_x float8 NULL,
+	hc_y float8 NULL,
+	tfs_deprecated text NULL,
+	tfs_zulu_deprecated text NULL,
+	fielder_2 float8 NULL,
+	umpire text NULL,
+	sv_id text NULL,
+	vx0 float8 NULL,
+	vy0 float8 NULL,
+	vz0 float8 NULL,
+	ax float8 NULL,
+	ay float8 NULL,
+	az float8 NULL,
+	sz_top float8 NULL,
+	sz_bot float8 NULL,
+	hit_distance_sc float8 NULL,
+	launch_speed float8 NULL,
+	launch_angle float8 NULL,
+	effective_speed float8 NULL,
+	release_spin_rate float8 NULL,
+	release_extension float8 NULL,
+	game_pk int4 NULL,
+	fielder_3 float8 NULL,
+	fielder_4 float8 NULL,
+	fielder_5 float8 NULL,
+	fielder_6 float8 NULL,
+	fielder_7 float8 NULL,
+	fielder_8 float8 NULL,
+	fielder_9 float8 NULL,
+	release_pos_y float8 NULL,
+	estimated_ba_using_speedangle float8 NULL,
+	estimated_woba_using_speedangle float8 NULL,
+	woba_value float8 NULL,
+	woba_denom float8 NULL,
+	babip_value float8 NULL,
+	iso_value float8 NULL,
+	launch_speed_angle float8 NULL,
+	at_bat_number int4 NULL,
+	pitch_number int4 NULL,
+	pitch_name text NULL,
+	home_score int4 NULL,
+	away_score int4 NULL,
+	bat_score int4 NULL,
+	fld_score int4 NULL,
+	post_away_score int4 NULL,
+	post_home_score int4 NULL,
+	post_bat_score int4 NULL,
+	post_fld_score int4 NULL,
+	if_fielding_alignment text NULL,
+	of_fielding_alignment text NULL
 );
+
+CREATE TABLE rosters.players (
+	birth_country text NULL,
+	name_prefix text NULL,
+	name_display_first_last text NULL,
+	college text NULL,
+	height_inches int4 NULL,
+	death_country text NULL,
+	age int4 NULL,
+	name_display_first_last_html text NULL,
+	gender text NULL,
+	height_feet int4 NULL,
+	pro_debut_date text NULL,
+	death_date text NULL,
+	primary_position text NULL,
+	birth_date text NULL,
+	team_abbrev text NULL,
+	status text NULL,
+	name_display_last_first_html text NULL,
+	throws text NULL,
+	death_city text NULL,
+	primary_position_txt text NULL,
+	high_school text NULL,
+	name_display_roster_html text NULL,
+	name_use text NULL,
+	player_id int4 NOT NULL,
+	status_date text NULL,
+	primary_stat_type text NULL,
+	team_id int4 NULL,
+	active_sw text NULL,
+	primary_sport_code text NULL,
+	birth_state text NULL,
+	weight int4 NULL,
+	name_middle text NULL,
+	name_display_roster text NULL,
+	end_date text NULL,
+	jersey_number float8 NULL,
+	death_state text NULL,
+	name_first text NULL,
+	bats text NULL,
+	team_code text NULL,
+	birth_city text NULL,
+	name_nick text NULL,
+	status_code text NULL,
+	name_matrilineal text NULL,
+	team_name text NULL,
+	name_display_last_first text NULL,
+	twitter_id text NULL,
+	name_title text NULL,
+	file_code text NULL,
+	name_last text NULL,
+	start_date text NULL,
+	name_full text NULL,
+	CONSTRAINT players_pkey PRIMARY KEY (player_id)
+);
+
+CREATE TABLE rosters.roster_40 (
+	position_txt text NULL,
+	weight int4 NULL,
+	name_display_first_last text NULL,
+	college text NULL,
+	height_inches int4 NULL,
+	starter_sw text NULL,
+	jersey_number int4 NULL,
+	end_date date NULL,
+	name_first text NULL,
+	bats text NULL,
+	team_code text NULL,
+	height_feet int4 NULL,
+	pro_debut_date date NULL,
+	status_code text NULL,
+	primary_position text NULL,
+	birth_date date NULL,
+	team_abbrev text NULL,
+	throws text NULL,
+	team_name text NULL,
+	name_display_last_first text NULL,
+	name_use text NULL,
+	player_id int4 NULL,
+	name_last text NULL,
+	team_id int4 NULL,
+	start_date text NULL,
+	name_full text NULL
+);
+
+CREATE TABLE rosters.historical_rosters (
+	name_first_last text NULL,
+	weight int4 NULL,
+	primary_position text NULL,
+	birth_date date NULL,
+	throws text NULL,
+	stat_years text NULL,
+	height_inches int4 NULL,
+	name_sort text NULL,
+	status_short text NULL,
+	jersey_number int4 NULL,
+	player_first_last_html text NULL,
+	bats text NULL,
+	primary_position_cd text NULL,
+	position_desig text NULL,
+	forty_man_sw text NULL,
+	player_html text NULL,
+	height_feet int4 NULL,
+	player_id int4 NULL,
+	name_last_first text NULL,
+	current_sw text NULL,
+	roster_years text NULL,
+	team_id int4 NULL,
+	active_sw text NULL
+);
+
+CREATE TABLE league.schedule (
+	gamepk int4 NULL,
+	link varchar(120) NULL,
+	gametype varchar(8) NULL,
+	season int4 NULL,
+	gamedate timestamp NULL,
+	officialdate date NULL,
+	istie bool NULL,
+	gamenumber int4 NULL,
+	publicfacing bool NULL,
+	doubleheader varchar(8) NULL,
+	gamedaytype varchar(8) NULL,
+	tiebreaker varchar(8) NULL,
+	calendareventid varchar(120) NULL,
+	seasondisplay int4 NULL,
+	daynight varchar(8) NULL,
+	scheduledinnings int4 NULL,
+	inningbreaklength int4 NULL,
+	gamesinseries float8 NULL,
+	seriesgamenumber float8 NULL,
+	seriesdescription varchar(200) NULL,
+	recordsource varchar(10) NULL,
+	ifnecessary varchar(8) NULL,
+	ifnecessarydescription varchar(200) NULL,
+	status_abstractgamestate varchar(120) NULL,
+	status_codedgamestate varchar(12) NULL,
+	status_detailedstate varchar(120) NULL,
+	status_statuscode varchar(12) NULL,
+	status_abstractgamecode varchar(12) NULL,
+	teams_away_leaguerecord_wins int4 NULL,
+	teams_away_leaguerecord_losses int4 NULL,
+	teams_away_leaguerecord_pct float8 NULL,
+	teams_away_score float8 NULL,
+	teams_away_team_id int4 NULL,
+	teams_away_team_name varchar(200) NULL,
+	teams_away_team_link varchar(120) NULL,
+	teams_away_iswinner bool NULL,
+	teams_away_splitsquad bool NULL,
+	teams_away_seriesnumber float8 NULL,
+	teams_home_leaguerecord_wins int4 NULL,
+	teams_home_leaguerecord_losses int4 NULL,
+	teams_home_leaguerecord_pct float8 NULL,
+	teams_home_score float8 NULL,
+	teams_home_team_id int4 NULL,
+	teams_home_team_name varchar(200) NULL,
+	teams_home_team_link varchar(120) NULL,
+	teams_home_iswinner bool NULL,
+	teams_home_splitsquad bool NULL,
+	teams_home_seriesnumber float8 NULL,
+	venue_id int4 NULL,
+	venue_name varchar(400) NULL,
+	venue_link varchar(120) NULL,
+	content_link varchar(250) NULL,
+	status_reason varchar(120) NULL,
+	description varchar(1000) NULL,
+	rescheduledate timestamp NULL,
+	rescheduledfrom timestamp NULL,
+	status_starttimetbd bool NULL,
+	resumedate timestamp NULL,
+	resumedfrom timestamp NULL
+);
+
+CREATE TABLE league.teams (
+	venue_name text NULL,
+	franchise_code text NULL,
+	sport_code text NULL,
+	address_city text NULL,
+	city text NULL,
+	name_display_full text NULL,
+	spring_league_abbrev text NULL,
+	sport_id int4 NULL,
+	venue_id int4 NULL,
+	mlb_org_id int4 NULL,
+	mlb_org text NULL,
+	last_year_of_play int4 NULL,
+	league_full text NULL,
+	address_province text NULL,
+	league_id int4 NULL,
+	name_abbrev text NULL,
+	league text NULL,
+	spring_league text NULL,
+	base_url text NULL,
+	address_zip text NULL,
+	sport_code_display text NULL,
+	mlb_org_short text NULL,
+	time_zone text NULL,
+	address_line1 text NULL,
+	mlb_org_brief text NULL,
+	address_line2 text NULL,
+	season int4 NULL,
+	address_line3 text NULL,
+	division_abbrev text NULL,
+	name_display_short text NULL,
+	team_id int4 NOT NULL,
+	active_sw text NULL,
+	address_intl text NULL,
+	state text NULL,
+	address_country text NULL,
+	mlb_org_abbrev text NULL,
+	division text NULL,
+	team_code text NULL,
+	"name" text NULL,
+	website_url text NULL,
+	sport_code_name text NULL,
+	first_year_of_play int4 NULL,
+	league_abbrev text NULL,
+	name_display_long text NULL,
+	store_url text NULL,
+	time_zone_text text NULL,
+	name_short text NULL,
+	address_state text NULL,
+	division_full text NULL,
+	time_zone_num float8 NULL,
+	spring_league_full text NULL,
+	address text NULL,
+	name_display_brief text NULL,
+	file_code text NULL,
+	division_id int4 NULL,
+	spring_league_id int4 NULL,
+	venue_short text NULL,
+	CONSTRAINT teams_pkey PRIMARY KEY (team_id)
+);
+
+CREATE TABLE rosters.transactions (
+	trans_date_cd text NULL,
+	from_team_id int4 NULL,
+	orig_asset text NULL,
+	final_asset_type text NULL,
+	player text NULL,
+	resolution_cd text NULL,
+	final_asset text NULL,
+	name_display_first_last text NULL,
+	type_cd text NULL,
+	name_sort text NULL,
+	resolution_date text NULL,
+	conditional_sw text NULL,
+	team text NULL,
+	"type" text NULL,
+	name_display_last_first text NULL,
+	transaction_id int4 NULL,
+	trans_date date NULL,
+	effective_date date NULL,
+	player_id int4 NULL,
+	orig_asset_type text NULL,
+	from_team text NULL,
+	team_id int4 NULL,
+	note text NULL
+);
+
+CREATE MATERIALIZED VIEW rosters.missing_players as (
+  WITH players as (
+    SELECT DISTINCT
+      player_id
+    FROM rosters.players
+  ),
+  missing_from_40 as (
+    SELECT DISTINCT
+      r.player_id
+    FROM rosters.roster_40 r
+    LEFT JOIN players p
+    ON r.player_id = p.player_id
+    WHERE p.player_id IS NULL
+  ),
+  missing_from_past as (
+    SELECT DISTINCT
+      r.player_id
+    FROM rosters.historical_rosters r
+    LEFT JOIN players p
+    ON r.player_id = p.player_id
+    WHERE p.player_id IS NULL
+  )
+  SELECT player_id FROM missing_from_40
+  UNION
+  SELECT player_id FROM missing_from_past
+);
+
 EOSQL

@@ -1,25 +1,27 @@
-CREATE TABLE rosters.transactions(
-   trans_date_cd           VARCHAR(30)
-  ,from_team_id            INTEGER REFERENCES league.teams(team_id)
-  ,orig_asset              VARCHAR(30)
-  ,final_asset_type        VARCHAR(30)
-  ,player                  VARCHAR(30)
-  ,resolution_cd           VARCHAR(30)
-  ,final_asset             VARCHAR(30)
-  ,name_display_first_last VARCHAR(30)
-  ,type_cd                 VARCHAR(30)
-  ,name_sort               VARCHAR(30)
-  ,resolution_date         VARCHAR(30)
-  ,conditional_sw          VARCHAR(30)
-  ,team                    VARCHAR(30)
-  ,"type"                    VARCHAR(30)
-  ,name_display_last_first VARCHAR(30)
-  ,transaction_id          INTEGER PRIMARY KEY
-  ,trans_date              VARCHAR(30)
-  ,effective_date          VARCHAR(30)
-  ,player_id               INTEGER REFERENCES rosters.players(player_id)
-  ,orig_asset_type         VARCHAR(30)
-  ,from_team               VARCHAR(30)
-  ,team_id                 INTEGER  REFERENCES league.teams(team_id)
-  ,note                    VARCHAR(30)
+DROP TABLE IF EXISTS rosters.transactions;
+
+CREATE TABLE rosters.transactions (
+	trans_date_cd text NULL,
+	from_team_id int4 NULL,
+	orig_asset text NULL,
+	final_asset_type text NULL,
+	player text NULL,
+	resolution_cd text NULL,
+	final_asset text NULL,
+	name_display_first_last text NULL,
+	type_cd text NULL,
+	name_sort text NULL,
+	resolution_date text NULL,
+	conditional_sw text NULL,
+	team text NULL,
+	"type" text NULL,
+	name_display_last_first text NULL,
+	transaction_id int4 NULL,
+	trans_date date NULL,
+	effective_date date NULL,
+	player_id int4 NULL,
+	orig_asset_type text NULL,
+	from_team text NULL,
+	team_id int4 NULL,
+	note text NULL
 );
