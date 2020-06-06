@@ -1,4 +1,4 @@
-create table league.weekly_batting_stats as (
+create table viz_tables.weekly_batting_stats as (
 select
 	batter,
 	p_throws,
@@ -64,7 +64,7 @@ order by
 	inning_topbot = 'Top'
 );
 
-create table league.monthly_batting_stats as (
+create table viz_tables.monthly_batting_stats as (
 select
 	batter,
 	p_throws,
@@ -126,7 +126,7 @@ order by
 	date_part('year' , game_date)  ,
 	inning_topbot = 'Top'
 );
-create table league.yearly_batting_stats as (
+create table viz_tables.yearly_batting_stats as (
 select
 	batter,
 	p_throws,
@@ -187,8 +187,3 @@ order by
 	date_part('year' , game_date) ,
 	inning_topbot = 'Top'
 )
-
-
-
-
-

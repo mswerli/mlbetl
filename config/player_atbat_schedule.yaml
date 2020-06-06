@@ -5,10 +5,10 @@ include:
   ##Which seasons and teams to get at bat data for
   ##Can specify date ranges to narrow further
   atbat:
-    hfSea: [2017,2018,2019]
+    hfSea: [2019]
     team: ['All']
   schedule:
-    season: [2017,2018,2019]
+    season: [2019]
     startDate: 2019-03-01
     endDate: 2019-10-05
 ##Where to store csv and json data from API calls.

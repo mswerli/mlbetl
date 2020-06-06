@@ -23,6 +23,7 @@ output:
     roster_40: roster_40/
     roster_past: roster_past/
     transaction: transaction/
+# Method of loading to use
 load:
   team: 'truncate'
   roster_40: 'truncate'

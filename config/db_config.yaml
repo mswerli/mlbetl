@@ -26,15 +26,9 @@ tables:
   player:
     schema: rosters
     table: players
-    null_value: 'None'
+    null_value: ''
     sep: ','
     encoding: 'LATIN1'
-#  play_by_play:
-#    schema: league
-#    table: play_by_play
-#    null_value: 'None'
-#    sep: ','
-#    encoding: 'UTF8'
   schedule:
     schema: league
     table: schedule
