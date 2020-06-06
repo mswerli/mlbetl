@@ -1,4 +1,4 @@
-create table league.weekly_pitcher_stats as (
+create table viz_tables.weekly_pitcher_stats as (
 select
 	pitcher,
 	p_throws,
@@ -65,7 +65,7 @@ order by
 	inning_topbot = 'Bottom'
 );
 
-create table league.monthly_pitcher_stats as (
+create table viz_tables.monthly_pitcher_stats as (
 select
 	pitcher,
 	p_throws,
@@ -132,7 +132,7 @@ order by
 
 
 
-create table league.yearly_pitcher_stats as (
+create table viz_tables.yearly_pitcher_stats as (
 select
 	pitcher,
 	p_throws,

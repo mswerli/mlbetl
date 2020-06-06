@@ -1,28 +1,30 @@
-CREATE TABLE rosters.roster_40(
-   position_txt            VARCHAR(30)
-  ,weight                  INTEGER
-  ,name_display_first_last VARCHAR(30)
-  ,college                 VARCHAR(30)
-  ,height_inches           INTEGER
-  ,starter_sw              VARCHAR(30)
-  ,jersey_number           INTEGER
-  ,end_date                VARCHAR(30)
-  ,name_first              VARCHAR(30)
-  ,bats                    VARCHAR(30)
-  ,team_code               VARCHAR(30)
-  ,height_feet             INTEGER
-  ,pro_debut_date          VARCHAR(30)
-  ,status_code             VARCHAR(30)
-  ,primary_position        INTEGER
-  ,birth_date              VARCHAR(30)
-  ,team_abbrev             VARCHAR(30)
-  ,throws                  VARCHAR(30)
-  ,team_name               VARCHAR(30)
-  ,name_display_last_first VARCHAR(30)
-  ,name_use                VARCHAR(30)
-  ,player_id               INTEGER REFERENCES rosters.players(player_id)
-  ,name_last               VARCHAR(30)
-  ,team_id                 INTEGER REFERENCES league.teams(team_id)
-  ,start_date              VARCHAR(30)
-  ,name_full               VARCHAR(30)
+DROP TABLE IF EXISTS rosters.roster_40;
+
+CREATE TABLE rosters.roster_40 (
+	position_txt text NULL,
+	weight int4 NULL,
+	name_display_first_last text NULL,
+	college text NULL,
+	height_inches int4 NULL,
+	starter_sw text NULL,
+	jersey_number int4 NULL,
+	end_date date NULL,
+	name_first text NULL,
+	bats text NULL,
+	team_code text NULL,
+	height_feet int4 NULL,
+	pro_debut_date date NULL,
+	status_code text NULL,
+	primary_position text NULL,
+	birth_date date NULL,
+	team_abbrev text NULL,
+	throws text NULL,
+	team_name text NULL,
+	name_display_last_first text NULL,
+	name_use text NULL,
+	player_id int4 NULL,
+	name_last text NULL,
+	team_id int4 NULL,
+	start_date text NULL,
+	name_full text NULL
 );

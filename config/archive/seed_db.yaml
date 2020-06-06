@@ -1,0 +1,48 @@
+##Run using seed_dd.py script
+include:
+  ##teams to include
+  team :
+    season: ['2019']
+  ##Which teams 40 man rosters (for current date) to get
+  roster_40:
+    team_id: ['ALL']
+  ##Date range for transactsions to retrieve
+  transaction:
+    start_date: 2017-01-01
+    end_date: 2020-02-10
+  ##Past season rosters to get. Indicate teams and seasons
+  roster_past:
+    team_id: ['ALL']
+    start_season: 2017
+    end_season: 2019
+  ##Players to get. If all, will get player ids from rosters tables that aren't in players table
+  player:
+    player_id: ['ALL']
+  ##Which seasons and teams to get at bat data for
+  ##Can specify date ranges to narrow further
+  atbat:
+    hfSea: [2019]
+    team: ['All']
+  schedule:
+    season: [2019]
+    startDate: 2019-03-01
+    endDate: 2019-10-05
+##Where to store csv and json data from API calls.
+output:
+  dir: temp_data/
+  locations:
+    team: team/
+    roster_40: roster_40/
+    roster_past: roster_past/
+    transaction: transaction/
+    player: player/
+    atbat: atbat/
+    schedule: schedule/
+load:
+  team: 'truncate'
+  roster_40: 'truncate'
+  transaction: 'truncate'
+  roster_past: 'truncate'
+  player: 'append'
+  atbat: 'truncate'
+  schedule: 'truncate'

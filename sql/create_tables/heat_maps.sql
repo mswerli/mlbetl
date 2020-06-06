@@ -1,5 +1,4 @@
-drop table if exists league.pitch_coordinates;
-create table league.pitch_coordinates as (
+create table viz_tables.pitch_coordinates as (
 	select
 		pitcher,
 		batter,
@@ -25,7 +24,7 @@ create table league.pitch_coordinates as (
 	from league.play_by_play
 );
 
-create table league.zone_outcomes as (
+create table viz_tables.zone_outcomes as (
 
 	select
 		game_date,
@@ -58,11 +57,12 @@ create table league.zone_outcomes as (
 		sum((bb_type = 'ground_ball')::int) as ground_balls,
 		sum((bb_type = 'line_drive')::int) as line_drives,
 		sum((bb_type = 'fly_ball')::int) as fly_balls,
-		sum(in_zone::int) as in_zone,
+		sum((plate_x >= -.85 and plate_x <= .85 and
+	            plate_z >= 1.6 and plate_z <= 3.4)::int) as in_zone,
 	    sum((plate_x >= -.85 and plate_x <= .85 and
 	            plate_z >= 1.6 and plate_z <= 3.4 and type = 'S')::int) as swing_in_zone,
 	    sum((not (plate_x >= -.85 and plate_x <= .85 and
-	            plate_z >= 1.6 and plate_z <= 3.4) and (type = 'S'))::int) as swing_out_zone
+	            plate_z >= 1.6 and plate_z <= 3.4) and (type != 'S'))::int) as swing_out_zone
 	from league.play_by_play
 	group by
 		game_date,
@@ -72,3 +72,4 @@ create table league.zone_outcomes as (
 		pitch_type,
 		zone
 )
+

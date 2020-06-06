@@ -1,0 +1,32 @@
+##Run using seed_dd.py script
+include:
+  player:
+    player_id: ['ALL']
+  ##Which seasons and teams to get at bat data for
+  ##Can specify date ranges to narrow further
+  atbat:
+    hfSea: [2019]
+    team: ['All']
+  schedule:
+    season: [2019]
+    startDate: 2019-03-01
+    endDate: 2019-10-05
+##Where to store csv and json data from API calls.
+output:
+  dir: temp_data/
+  locations:
+    team: team/
+    roster_40: roster_40/
+    roster_past: roster_past/
+    transaction: transaction/
+    player: player/
+    atbat: atbat/
+    schedule: schedule/
+load:
+  team: 'truncate'
+  roster_40: 'truncate'
+  transaction: 'truncate'
+  roster_past: 'truncate'
+  player: 'append'
+  atbat: 'truncate'
+  schedule: 'truncate'
