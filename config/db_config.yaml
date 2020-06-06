@@ -2,28 +2,48 @@ tables:
   team:
     schema: league
     table: teams
-    null_value: 'None'
+    null_value: ''
+    sep: ','
+    encoding: 'UTF8'
   roster_40:
     schema: rosters
     table: roster_40
-    null_value: 'None'
+    null_value: ''
+    sep: ','
+    encoding: 'UTF8'
   roster_past:
     schema: rosters
     table: historical_rosters
-    null_value: 'None'
+    null_value: ''
+    sep: ','
+    encoding: 'UTF8'
   transaction:
     schema: rosters
     table: transactions
-    null_value: 'None'
+    null_value: ''
+    sep: ','
+    encoding: 'UTF8'
   player:
     schema: rosters
     table: players
     null_value: 'None'
-  play_by_play:
-    schema: league
-    table: play_by_play
-    null_value: 'None'
+    sep: ','
+    encoding: 'LATIN1'
+#  play_by_play:
+#    schema: league
+#    table: play_by_play
+#    null_value: 'None'
+#    sep: ','
+#    encoding: 'UTF8'
   schedule:
     schema: league
     table: schedule
     null_value: ''
+    sep: ','
+    encoding: 'UTF8'
+  atbat:
+    schema: league
+    table: play_by_play
+    null_value: ''
+    sep: '\t'
+    encoding: 'LATIN1'

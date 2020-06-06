@@ -2,6 +2,7 @@ import psycopg2 as pg
 import sqlalchemy as sql
 import yaml
 import datetime
+import codecs
 
 class load_step:
 
@@ -10,15 +11,15 @@ class load_step:
         with open(r'config/' + db_config) as file:
             db_config = yaml.load(file, Loader=yaml.FullLoader)
 
+        self.table_map = config.table_map
         self.config = config.config
-
         self.files = config.staged_files
+        self.endpoints = config.endpoints
 
         with open('config/api.yaml') as file:
             self.api_map = yaml.load(file, Loader=yaml.FullLoader)
 
-        with open('config/db_config.yaml') as file:
-            self.table_map = yaml.load(file, Loader=yaml.FullLoader)
+
 
         self.engine = sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}" \
                                         .format(db_config['user'],
@@ -32,6 +33,8 @@ class load_step:
                                user=db_config['user'],
                                port=db_config['port'],
                                password=db_config['password'])
+
+        self.run()
 
     def truncate_table(self, endpoint):
 
@@ -69,18 +72,29 @@ class load_step:
         self.conn.commit()
         cursor.close()
 
-    def copy_df_to_table(self, endpoint):
+    def copy_file_to_table(self, endpoint):
+        table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
         cursor = self.conn.cursor()
 
         f = open(self.files[endpoint], 'rb')
         next(f)
+        if self.table_map['tables'][endpoint]['encoding'] != 'UTF8':
+            f = codecs.EncodedFile(f, "UTF8", self.table_map['tables'][endpoint]['encoding'])
+
         cursor.copy_from(f,
-                         table='rosters.players', sep='\t',
-                         null=self.table_map[endpoint]['null_value'])
+                         table=table, sep='\t',
+                         null=self.table_map['tables'][endpoint]['null_value'])
 
         self.conn.commit()
 
         cursor.close()
+
+    def run(self):
+        for ep in self.endpoints:
+            if self.config['load'][ep] == 'truncate':
+                self.truncate_table(ep)
+
+            self.copy_file_to_table(ep)
 
 
 

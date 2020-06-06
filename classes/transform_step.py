@@ -12,10 +12,13 @@ class transform_step:
         self.config_object=config
         self.config=config.config
         self.schemas=config.schemas
-        self.endpoints=self.config['include'].keys()
+        self.endpoints=config.endpoints
 
         with open('config/api.yaml') as file:
             self.api_map = yaml.load(file, Loader=yaml.FullLoader)
+
+        with open('config/db_config.yaml') as file:
+            self.table_map = yaml.load(file, Loader=yaml.FullLoader)
 
         self.engine=config.engine
 
@@ -69,19 +72,11 @@ class transform_step:
 
     def convert_integer(self, df, col):
 
-        try:
-            df[col] = df[col].astype(int)
-        except:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-
-        #df[col] = df[col].fillna(None)
-
+        df[col] = df[col].astype(object)
         return df
 
     def convert_float(self, df, col):
-
         df[col] = df[col].replace('', np.nan).astype(float)
-        #df[col] = df[col].replace({pd.np.nan: None})
 
         return df
 
@@ -120,48 +115,67 @@ class transform_step:
 
             df = cast_column(df, col_name)
 
-        return(df)
+        return df
 
+    def filter_columns(self, df, endpoint):
+        excess_columns = list(set(df.columns.values) - set(self.schemas[endpoint]['column_name']))
+        df.drop(excess_columns, axis=1, inplace=True)
+        return df
 
-    def get_al_files(self):
-
+    def get_all_files(self):
         for ep in self.endpoints:
-            files = os.listdir(self.config['output']['dir'] +\
-                               self.config['output']['locations'][ep])
-
-            self.files[ep] = files
+            path = self.config['output']['dir'] + \
+                   self.config['output']['locations'][ep]
+            if os.path.isdir(path):
+                files = os.listdir(path)
+                self.files[ep] = files
 
     def collapse_files_to_csv(self, endpoint):
+        print(self.files.keys())
 
         if self.api_map['apiMap'][endpoint]['format'] == 'json':
             jsonpath_expr = parse(self.api_map['apiMap'][endpoint]['json_path'])
             all_data = []
-            for file in self.files[endpoint]:
-                with open(self.config['output']['dir'] + '/' + endpoint + '/' + file) as f:
-                    data = json.load(f)
-                    data = [match.value for match in jsonpath_expr.find(data)]
-                    all_data.append(data)
+            if os.path.isdir(self.config['output']['dir'] + '/' + endpoint):
+                for file in self.files[endpoint]:
+                    with open(self.config['output']['dir'] + '/' + endpoint + '/' + file) as f:
+                        data = json.load(f)
+                        data = [match.value for match in jsonpath_expr.find(data)]
+                        all_data.append(data)
 
-            dfs = [pd.json_normalize(item) for item in all_data]
-            df = pd.concat(dfs)
-            new_cols = {col:col.lower().replace('.','_') for col in df.columns.values}
-            df = df.rename(columns = new_cols)
-            df = self.convert_all_data_type(df, schema=self.schemas[endpoint])
+                dfs = [pd.json_normalize(item) for item in all_data]
+                df = pd.concat(dfs)
+                new_cols = {col:col.lower().replace('.','_') for col in df.columns.values}
+                df = df.rename(columns = new_cols)
+                df = self.convert_all_data_type(df, schema=self.schemas[endpoint])
 
         else:
-            dfs = [pd.read_csv(file) for file in self.files['endpoint']]
-            df = pd.concat(dfs)
+            all_data = []
+            if os.path.isdir(self.config['output']['dir'] + '/' + endpoint):
+                print(self.files.keys())
+                for file in self.files[endpoint]:
+                    df = pd.read_csv(self.config['output']['dir'] + '/' + endpoint + '/' + file)
+                    df =self.convert_all_data_type(df, schema=self.schemas[endpoint])
+                    all_data.append(df)
+            df = pd.concat(all_data)
 
+        df = self.filter_columns(df, endpoint)
         file_name = self.staging_dir + '/' + endpoint + '.csv'
 
-        df.to_csv(file_name, sep='\t', index=False, na_rep=None, encoding = 'latin-1')
+        df.to_csv(file_name,
+                  #sep=self.table_map['tables'][endpoint]['sep'],
+                  sep= '\t',
+                  index=False,
+                  encoding = 'UTF-8')
 
         self.staged_files[endpoint] = file_name
 
     def run(self):
+        print(self.endpoints)
 
-        self.get_al_files()
+        self.get_all_files()
+        print(self.files.keys())
 
-        for ep in self.endpoints:
+        for ep in list(self.files.keys()):
             print(ep)
             self.collapse_files_to_csv(ep)
