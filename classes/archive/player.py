@@ -1,10 +1,10 @@
-from utility_classes.file_reader import file_reader
-from utility_classes.postgres_table import postgres_table
-from utility_classes.url_factory import url_factory
+from classes.archive.file_reader import file_reader
+from classes.archive.postgres_table import postgres_table
+from classes.archive.url_factory import url_factory
 import yaml
 
 
-class loader(file_reader,postgres_table, url_factory):
+class player(file_reader,postgres_table, url_factory):
 
     def __init__(self, table, config, db_config, file_store):
 
@@ -20,47 +20,39 @@ class loader(file_reader,postgres_table, url_factory):
 
         self.file_store = file_store
         self.table = table
-        self.create_urls = self.pick_url_method()
+        self.existing_ids = self.get_existing_ids()
+        self.roster_ids = self.get_roster_ids()
+        self.ids = set(self.roster_ids) - set(self.existing_ids)
         self.request_urls = self.create_urls()
         self.steps = self.config['steps'][self.table]
 
-    def pick_url_method(self):
+    def create_urls(self, ids=None):
 
-        if self.table == 'team':
-           return self.create_team_urls
+        ids = self.ids if ids is None else ids
 
-        elif self.table == 'player':
-            return self.create_player_urls
+        param_dicts= [{'player_id':a} for a in ids]
+        urls = [self.update_url('player', a) for a in param_dicts]
 
-        elif self.table == 'roster_40':
-            return self.create_40_man_urls
+        return urls
 
-        elif self.table == 'roster_40':
-            return self.create_40_man_urls
+    def get_roster_ids(self):
 
-        elif self.table == 'roster_past':
-            return self.create_past_roster_urls
+       query =  self.id_query.format('player_id', 'rosters','roster_40')
+       roster_ids = self.engine.execute(query).fetchall()
+       roster_ids = [str(a[0]) for a in roster_ids]
 
-        elif self.table == 'transaction':
-            return self.create_transaction_urls
-
-        else:
-            raise NotImplementedError('URL creation not implemented for %s', self.table)
+       return roster_ids
 
     def populate_table(self, load_type, load_method):
+
         df = self.read_all_type_files(self.table)
         self.transform_and_load(df, load_type=load_type)
 
-    def execute_steps(self,):
+    def execute_steps(self):
+
         if 'extract' in self.steps.keys():
             self.make_all_requests()
 
         if 'load' in self.steps.keys():
             self.populate_table(load_type=self.steps['load']['load_type'],
-                                load_method=self.steps['load']['load_method'])
-
-
-
-
-
-
+                                load_method= self.steps['load']['load_method'])

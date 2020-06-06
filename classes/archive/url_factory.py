@@ -102,8 +102,6 @@ class url_factory:
 
         return urls
 
-
-
     def create_transaction_urls(self):
         start_date=self.config['include']['transaction']['start_date']
         end_date=self.config['include']['transaction']['end_date']
@@ -155,23 +153,12 @@ class url_factory:
         self.write_to_file_store(raw_data,file_name)
 
 
-    #def make_all_type_requests(self, url_type):
-
-     #   for a in self.request_urls[url_type]:
-     #      self.files[url_type].append(self.make_request(url_type,a,
-     #                                                     zzz=random.randint(5, 16) if url_type != 'at_bat' else random.randint(60, 120)))
-
     def make_all_requests(self):
 
         for url in self.request_urls:
             print(url)
             self.make_request(url)
 
- #   def run(self):
- #
- #       self.create_all_urls()
- #
- #       self.make_all_request()
 
 
 
