@@ -1,0 +1,29 @@
+##Run using seed_dd.py script
+extract:
+  sources:
+    player:
+      params:
+        player_id: ['ALL']
+    ##Which seasons and teams to get at bat data for
+    ##Can specify date ranges to narrow further
+    playbyplay:
+      pathParams:
+        game_pk: ['All']
+  ##Where to store csv and json data from API calls.
+  output:
+    dir: temp_data/
+    locations:
+      player: player/
+      playbyplay: playbyplay
+transform:
+  types:
+    - player
+    - plays
+load:
+  team: 'truncate'
+  roster_40: 'truncate'
+  transaction: 'truncate'
+  roster_past: 'truncate'
+  player: 'truncate'
+  schedule: 'truncate'
+  plays: 'truncate'

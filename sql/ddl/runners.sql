@@ -1,0 +1,23 @@
+CREATE TABLE league.runners (
+    "credits" jsonb NULL,
+    "movement.start" varchar(20) NULL,
+    "movement.end" varchar(20) NULL,
+    "movement.outBase" varchar(20) NULL,
+    "movement.isOut" boolean NULL,
+    "movement.outNumber" float NULL,
+    "details.event" varchar(100) NULL,
+    "details.eventType" varchar(100) NULL ,
+    "details.movementReason" varchar(100) NULL,
+    "details.runner.id"  int NULL,
+    "details.runner.fullName" varchar(500) NULL,
+    "details.runner.link"  varchar(500),
+    "details.responsiblePitcher" int NULL,
+    "details.isScoringEvent" boolean NULL,
+    "details.rbi" boolean NULL,
+    "details.earned" boolean NULL,
+    "details.teamUnearned" boolean NULL,
+    "details.playIndex" int NULL,
+    "details.responsiblePitcher.id" float NULL,
+    "details.responsiblePitcher.link" varchar(500) NULL,
+    "game_pk" float NULL
+);

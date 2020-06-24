@@ -1,0 +1,89 @@
+types:
+  team:
+    source: team
+    format: json
+    json_path:
+      top_level:
+        - team_all_season
+        - queryResults
+        - row
+      record_path: None
+      meta: None
+  roster_40:
+    source: roster_40
+    format: json
+    json_path:
+      top_level:
+        - roster_40
+        - queryResults
+        - row
+      record_path: None
+      meta: None
+  roster_past:
+    source: roster_past
+    format: json
+    json_path:
+      top_level:
+        - roster_team_alltime
+        - queryResults
+        - row
+      record_path: None
+      meta: None
+  transaction:
+    source: transaction
+    format: json
+    json_path:
+      top_level:
+        - transaction_all
+        - queryResults
+        - row
+      record_path: None
+      meta: None
+  player:
+    source: player
+    format: json
+    json_path:
+      top_level:
+        - player_info
+        - queryResults
+        - row
+      record_path: None
+      meta: None
+  atbat:
+    source: atbat
+    format: csv
+  events:
+    source: playbyplay
+    format: json
+    json_path:
+      top_level:
+        - allPlays
+      record_path: playEvents
+      meta: [['result','event']]
+      ids: ['game_pk']
+  runners:
+    source: playbyplay
+    format: json
+    json_path:
+      top_level:
+        - allPlays
+      record_path: runners
+      meta: None
+      ids: ['game_pk']
+  plays:
+    source: playbyplay
+    format: json
+    json_path:
+      top_level:
+        - allPlays
+      record_path: None
+      meta: None
+      ids: ['game_pk']
+  schedule:
+    source: schedule
+    format: json
+    json_path:
+      top_level:
+        - dates
+      record_path: games
+      meta: None

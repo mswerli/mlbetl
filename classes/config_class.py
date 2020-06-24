@@ -14,8 +14,13 @@ class config_class:
         with open(r'config/' + db_config) as file:
             db_config = yaml.load(file, Loader=yaml.FullLoader)
 
-        with open(r'config/' + tables) as file:
-            self.tables = yaml.load(file, Loader=yaml.FullLoader)
+        with open(r'config/global/' + tables) as file:
+            self.table_map = yaml.load(file, Loader=yaml.FullLoader)
+
+        with open('config/global/transform.yaml') as file:
+            self.transform_map = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.staged_files = {}
 
         self.engine=sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}"\
             .format(db_config['user'],
@@ -39,15 +44,20 @@ class config_class:
 
         self.schemas = {}
 
-        self.constructor = parameter_constructor(endpoints = 'config/api.yaml')
+        self.constructor = parameter_constructor(endpoints = 'config/global/api.yaml')
 
-        self.endpoints =  list(self.config['include'].keys())
+        self.endpoints =  list(self.config['extract']['sources'].keys())
 
         self.parameters = None
 
         self.urls = {ep:[] for ep in self.endpoints}
 
         self.run_config()
+
+    def get_staged_files(self, staging_dir):
+
+        for file in self.config['transform']['types']:
+            self.staged_files[file] = staging_dir + '/' + file + '.csv'
 
     def get_missing_player_ids(self):
 
@@ -60,12 +70,23 @@ class config_class:
 
         return player_ids
 
+    def get_missing_game_ids(self):
+
+        ##Used to get players who are on rosters but not in the players table
+        ##Values will be used if All is indicated for player ids in config file
+
+        query = """select game_pk from league.missing_games"""
+        res = self.engine.execute(query)
+        game_ids = [a[0] for a in res.fetchall()]
+
+        return game_ids
+
     def get_schema(self):
 
-        for endpoint in self.endpoints:
+        for endpoint in self.config['transform']['types']:
 
-            query = self.col_type_query.format(self.tables['tables'][endpoint]['schema'],
-                                               self.tables['tables'][endpoint]['table'])
+            query = self.col_type_query.format(self.table_map['tables'][endpoint]['schema'],
+                                               self.table_map['tables'][endpoint]['table'])
 
             schema = self.engine.execute(query)\
                 .fetchall()
@@ -93,18 +114,18 @@ class config_class:
 
         ##Used to substitute All values for team_id in config files
 
-        with open(r'config/teams.yaml') as file:
+        with open(r'config/global/teams.yaml') as file:
             teams = yaml.load(file, Loader=yaml.FullLoader)
 
         team_ids = [team[id_type] for team in teams]
 
         return team_ids
 
-    def get_parameters(self, endpoint):
+    def get_parameters(self, endpoint, param_type='params'):
 
         ##For an endpoint, get all parameters
 
-        parameters = self.config['include'][endpoint]
+        parameters = self.config['extract']['sources'][endpoint][param_type]
 
         for key in parameters.keys():
             if type(parameters.get(key))  != list:
@@ -123,6 +144,9 @@ class config_class:
 
         if 'player_id' in needs_replacement:
             parameters['player_id'] = self.get_missing_player_ids()
+
+        if 'game_pk' in needs_replacement:
+            parameters['game_pk'] = self.get_missing_game_ids()
 
         dates = None
         if 'dates' in self.constructor.endpoints['apiMap'][endpoint].keys():
@@ -148,7 +172,8 @@ class config_class:
             output_parameters.append([{key: str(v)} for v in parameters[key]])
 
         params = self.constructor.create_request_params(output_parameters,
-                                                        endpoint)
+                                                        endpoint,
+                                                        param_type)
         if dates is not None:
             if params != ['']:
                 params = [[param + date for param in params] for date in dates]
@@ -157,19 +182,34 @@ class config_class:
 
         return params
 
+    def find_path_parameters(self, endpoint):
+
+        path_params = set(self.config['extract']['sources'][endpoint]['pathParams'].keys())
+        required_params = set(self.constructor.endpoints['apiMap'][endpoint].keys())
+        if (required_params - path_params) == set():
+            return self.config['extract']['sources'][endpoint]['pathParams']
+        else:
+            missing_parameters = list(required_params - path_params)
+            raise Exception('Required parameters missing: ' + ','.join(missing_parameters))
+
     def generate_urls(self):
-
         ##generate all urls needed to make required requests
-
-
         for ep in self.endpoints:
-            print(ep)
-
-            parameters = self.get_parameters(endpoint=ep)
             api = self.constructor.endpoints['apiMap'][ep]['api']
             base_url = self.constructor.endpoints[api]['base']
             path =  self.constructor.endpoints[api]['endpoints'][ep]['template']
-            urls = [base_url +  path + '&'+ params for params in parameters]
+            url = base_url +  path
+            if 'params' in self.constructor.endpoints[api]['endpoints'][ep].keys():
+                parameters = self.get_parameters(endpoint=ep)
+                urls = [url + '&'+ params for params in parameters]
+            else:
+                urls = url
+            if 'pathParams' in self.constructor.endpoints[api]['endpoints'][ep].keys():
+                path_params = self.get_parameters(ep, param_type='pathParams')
+                urls = [url.format(**param) for param in path_params]
+                urls = [{url:path_param} for url,path_param in zip(urls,path_params)]
+            else:
+                urls = [{url:None} for url in urls]
 
             self.urls[ep].append(urls)
 
