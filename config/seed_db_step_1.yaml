@@ -1,0 +1,57 @@
+##Run using seed_dd.py script
+extract:
+  sources:
+    ##teams to include
+    team :
+      params:
+        season: ['2019']
+    ##Which teams 40 man rosters (for current date) to get
+    roster_40:
+      params:
+        team_id: ['ALL']
+    ##Date range for transactsions to retrieve
+    transaction:
+      params:
+        start_date: 2017-01-01
+        end_date: 2020-02-10
+    ##Past season rosters to get. Indicate teams and seasons
+    roster_past:
+      params:
+        team_id: ['ALL']
+        start_season: 2017
+        end_season: 2019
+    atbat:
+      params:
+        hfSea: [2019]
+        team: ['All']
+  schedule:
+    params:
+      season: [2019]
+      startDate: 2019-03-01
+      endDate: 2019-10-05
+    ##Players to get. If all, will get player ids from rosters tables that aren't in players table
+  output:
+    dir: temp_data/
+    locations:
+      team: team/
+      roster_40: roster_40/
+      roster_past: roster_past/
+      transaction: transaction/
+      atbat: atbat/
+      schedule: schedule/
+transform:
+  types:
+    - team
+    - roster_40
+    - roster_past
+    - transaction
+    - atbat
+    - schedule
+# Method of loading to use
+load:
+  team: 'truncate'
+  roster_40: 'truncate'
+  transaction: 'truncate'
+  roster_past: 'truncate'
+  atbat: 'truncate'
+  schedule: 'truncate'

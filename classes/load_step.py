@@ -16,10 +16,8 @@ class load_step:
         self.files = config.staged_files
         self.endpoints = config.endpoints
 
-        with open('config/api.yaml') as file:
+        with open('config/global/api.yaml') as file:
             self.api_map = yaml.load(file, Loader=yaml.FullLoader)
-
-
 
         self.engine = sql.create_engine("postgresql+psycopg2://{}:{}@{}:{}/{}" \
                                         .format(db_config['user'],
@@ -45,6 +43,10 @@ class load_step:
     def refresh_missing_players(self):
 
         self.engine.execute("REFRESH MATERIALIZED VIEW rosters.missing_players")
+
+    def refresh_missing_games(self):
+
+        self.engine.execute("REFRESH MATERIALIZED VIEW league.missing_games")
 
     def remove_rows_in_date_range(self, date_col, min_date, endpoint, max_date=None):
 
@@ -78,6 +80,7 @@ class load_step:
 
     def copy_file_to_table(self, endpoint):
         table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
+        print(table)
         cursor = self.conn.cursor()
 
         f = open(self.files[endpoint], 'rb')
@@ -85,22 +88,31 @@ class load_step:
         if self.table_map['tables'][endpoint]['encoding'] != 'UTF8':
             f = codecs.EncodedFile(f, "UTF8", self.table_map['tables'][endpoint]['encoding'])
 
-        cursor.copy_from(f,
-                         table=table, sep='\t',
-                         null=self.table_map['tables'][endpoint]['null_value'])
+        copy_sql = """
+                   COPY {} FROM stdin WITH CSV HEADER
+                   DELIMITER as '\t'
+                   """.format(table)
+
+        with open(self.files[endpoint], 'r') as f:
+            cursor.copy_expert(sql=copy_sql, file=f)
+
+       # cursor.copy_from(f,
+       #                  table=table, sep='\t',
+       #                  null=self.table_map['tables'][endpoint]['null_value'])
 
         self.conn.commit()
 
         cursor.close()
 
     def run(self):
-        for ep in self.endpoints:
+        for ep in self.config['transform']['types']:
             if self.config['load'][ep] == 'truncate':
                 self.truncate_table(ep)
 
             self.copy_file_to_table(ep)
 
         self.refresh_missing_players()
+        self.refresh_missing_games()
 
 
 

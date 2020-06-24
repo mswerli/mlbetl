@@ -41,3 +41,15 @@ tables:
     null_value: ''
     sep: '\t'
     encoding: 'LATIN1'
+  events:
+    schema: league
+    table: events
+    null_value: ''
+    sep: ','
+    encoding: 'LATIN1'
+  plays:
+    schema: league
+    table: atbat
+    null_value: ''
+    sep: ','
+    encoding: 'LATIN1'

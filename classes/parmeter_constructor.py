@@ -8,7 +8,7 @@ class parameter_constructor:
     ##Class for generating lists of parameter dictionaries for substituting into request urls
     ##Uses itertools to make all unique combinations of a give number of lists
 
-    def __init__(self, endpoints = 'config/api.yaml'):
+    def __init__(self, endpoints = 'config/global/api.yaml'):
 
         with open(endpoints) as file:
             self.endpoints = yaml.load(file, Loader=yaml.FullLoader)
@@ -16,7 +16,7 @@ class parameter_constructor:
         self.output_params = []
 
 
-    def create_request_params(self, params, endpoint):
+    def create_request_params(self, params, endpoint, param_type = 'params'):
 
         ##Take a dictionary of dictironaries and generate all combinations of items
         ##Results in list of dictionaries
@@ -25,17 +25,21 @@ class parameter_constructor:
 
         api = self.endpoints['apiMap'][endpoint]['api']
         endpoint_config = self.endpoints[api]['endpoints'][endpoint]
-        required_params = endpoint_config['params']
+        required_params = endpoint_config[param_type]
 
         all_params = []
+
+
         for combination in itertools.product(*params):
             temp = [a for a in combination]
             new_dict = dict(pair for d in temp for pair in d.items())
 
-            param = '&'.join([k + '=' + str(v)\
-                              for k, v in zip(new_dict.keys(), new_dict.values())])
-
-            all_params.append(param)
+            if param_type == 'params':
+                param = '&'.join([k + '=' + str(v)\
+                                  for k, v in zip(new_dict.keys(), new_dict.values())])
+                all_params.append(param)
+            else:
+                all_params.append(new_dict)
 
 
         return all_params

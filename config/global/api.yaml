@@ -2,25 +2,21 @@ apiMap:
   team:
     api: mlbapi
     format: json
-    json_path: team_all_season.queryResults.row[*]
     team: team_id
     sleep: 0
   roster_40:
     api: mlbapi
     format: json
-    json_path: roster_40.queryResults.row[*]
     team: team_id
     sleep: 0
   roster_past:
     api: mlbapi
     format: json
-    json_path: roster_team_alltime.queryResults.row[*]
     team: team_id
     sleep: 0
   transaction:
     api: mlbapi
     format: json
-    json_path: transaction_all.queryResults.row[*]
     team: team_id
     sleep: 0
     dates:
@@ -30,7 +26,6 @@ apiMap:
   player:
     api: mlbapi
     format: json
-    json_path : player_info.queryResults.row[*]
     team: team_id
     sleep: 0
   atbat:
@@ -44,12 +39,11 @@ apiMap:
       delim: ''
   playbyplay:
     api: mlbstats
-    format: csv
+    format: json
     sleep: 0
   schedule:
     api: mlbstats
     format: json
-    json_path: dates[*].games[*]
     sleep: 0
     dates:
       params: ['startDate','endDate']
