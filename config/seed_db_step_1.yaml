@@ -24,12 +24,12 @@ extract:
       params:
         hfSea: [2019]
         team: ['All']
-  schedule:
-    params:
-      season: [2019]
-      startDate: 2019-03-01
-      endDate: 2019-10-05
-    ##Players to get. If all, will get player ids from rosters tables that aren't in players table
+    schedule:
+      params:
+        season: [2019]
+        startDate: 2019-03-01
+        endDate: 2019-10-05
+      ##Players to get. If all, will get player ids from rosters tables that aren't in players table
   output:
     dir: temp_data/
     locations:

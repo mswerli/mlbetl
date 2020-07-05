@@ -3,14 +3,11 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d "$POSTGRES_DB"  <<-EOSQL
     DROP SCHEMA  IF EXISTS league CASCADE;
     DROP SCHEMA  IF EXISTS rosters CASCADE;
     DROP SCHEMA  IF EXISTS viz_tables CASCADE;
-     CREATE SCHEMA league
-        AUTHORIZATION postgres;
+     CREATE SCHEMA league;
 
-    CREATE SCHEMA rosters
-        AUTHORIZATION postgres;
+    CREATE SCHEMA rosters;
 
-    CREATE SCHEMA viz_tables
-        AUTHORIZATION postgres;
+    CREATE SCHEMA viz_tables;
 
 CREATE TABLE league.play_by_play (
 	pitch_type text NULL,
