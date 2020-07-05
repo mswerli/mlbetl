@@ -5,6 +5,7 @@ from classes.load_step import load_step
 
 
 def run_config(CONFIG, DB_CONFIG, DB_MAP):
+
     config_object = config_class(config_file = CONFIG ,
                                  db_config = DB_CONFIG,
                                  tables = DB_MAP)

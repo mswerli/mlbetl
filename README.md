@@ -27,6 +27,7 @@ Database
 - Connection information should be defined in a yaml file similar to `config/local_db.yaml`.
 - There is a dockerfile and a docker compose file which should allow (by running `docker-compose up`) for a local postgres database to be spun up and for needed tables to be created (see `sql/initdb.sh`)
 - If you care to run a postgres instance outside of the docker setup provided, just generate a cofiguration yaml for the db
+    * The docker container in the repo can be used to populate a remote database by runnig `docker run -e PGHOST=$PGHOST -e PGPORT=$PGPORT -e PGDATABASE=$PGDATABASE -e PGUSER=$PGUSER -e PGPASSWORD=$PGPASSWORD sh populate_db.sh` 
 - To load a subset of data into the database, run the `seed_db.py` script
 - If running locally using the docker compose file in this repo, you can navigate to localhost:5050 to access pgadmin. You'll need to do the following
     * To log into pg admin use the following credentials: `user: pgadmin4@pgadmin.org` and `password:admin`

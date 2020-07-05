@@ -7,6 +7,9 @@ from classes.parmeter_constructor  import parameter_constructor
 class config_class:
 
     def __init__(self, config_file, db_config, tables):
+        print(config_file)
+        print(db_config)
+        print(tables)
 
         with open(config_file) as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
@@ -14,7 +17,7 @@ class config_class:
         with open(r'config/' + db_config) as file:
             db_config = yaml.load(file, Loader=yaml.FullLoader)
 
-        with open(r'config/global/' + tables) as file:
+        with open(r'config/' + tables) as file:
             self.table_map = yaml.load(file, Loader=yaml.FullLoader)
 
         with open('config/global/transform.yaml') as file:

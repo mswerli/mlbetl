@@ -25,5 +25,4 @@ load:
   transaction: 'truncate'
   roster_past: 'truncate'
   player: 'truncate'
-  schedule: 'truncate'
   plays: 'truncate'
