@@ -2,6 +2,8 @@ import yaml
 import sqlalchemy as sql
 import pandas as pd
 from classes.parmeter_constructor  import parameter_constructor
+from datetime import datetime
+
 
 
 class config_class:
@@ -84,6 +86,20 @@ class config_class:
 
         return game_ids
 
+    def get_max_date(self, endpoint):
+
+        print(self.table_map['tables'][endpoint])
+        replace_vals = {
+            "table": '.'.join([self.table_map['tables'][endpoint]['schema'], self.table_map['tables'][endpoint]['table']]),
+            "date" :  self.table_map['tables'][endpoint]['date']
+        }
+        ##Query to get maximum date
+        query = """select max({date})::date as max_date FROM {table}""".format(**replace_vals)
+        res = self.engine.execute(query)
+        max_date = [a[0] for a in res.fetchall()]
+
+        return max_date
+
     def get_schema(self):
 
         for endpoint in self.config['transform']['types']:
@@ -127,6 +143,7 @@ class config_class:
     def get_parameters(self, endpoint, param_type='params'):
 
         ##For an endpoint, get all parameters
+        print(endpoint)
 
         parameters = self.config['extract']['sources'][endpoint][param_type]
 
@@ -138,17 +155,23 @@ class config_class:
                 ##This is an obnoxious one off, so I'm not going to solve for it beyond an if statement
                 parameters['hfSea'] = [self.encode_hfsea(sea) for sea in  parameters['hfSea']]
 
-        needs_replacement = [k for k in parameters.keys() if parameters.get(k) in [['All'],['ALL']]]
+        for key, value in zip(parameters.keys(), parameters.values()):
+            if value == ['CURRENT_DATE']:
+                parameters.update({key:[datetime.date(datetime.today())]})
+            if value == ['TABLE_MAX']:
+                parameters.update({key: self.get_max_date(endpoint)})
 
-        if 'team' in needs_replacement or 'team_id' in needs_replacement:
-            team_param = 'team_id' if 'team_id' in needs_replacement else 'team'
+        add_all = [k for k in parameters.keys() if parameters.get(k) in [['All'],['ALL']]]
+
+        if 'team' in add_all or 'team_id' in add_all:
+            team_param = 'team_id' if 'team_id' in add_all else 'team'
             id_type = self.constructor.endpoints['apiMap'][endpoint]['team']
             parameters[team_param] = self.get_team_ids(id_type)
 
-        if 'player_id' in needs_replacement:
+        if 'player_id' in add_all:
             parameters['player_id'] = self.get_missing_player_ids()
 
-        if 'game_pk' in needs_replacement:
+        if 'game_pk' in add_all:
             parameters['game_pk'] = self.get_missing_game_ids()
 
         dates = None
@@ -158,7 +181,9 @@ class config_class:
                 dates = []
                 for p in date_params:
                     dates.append(parameters.get(p))
+                print(dates)
                 dates.sort()
+
 
                 del parameters[date_params[0]], parameters[date_params[1]]
 

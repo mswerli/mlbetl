@@ -3,6 +3,7 @@ import os
 import json
 import pandas as pd
 import numpy as np
+import datetime
 
 class transform_step:
 
@@ -80,6 +81,7 @@ class transform_step:
     def convert_integer(self, df, col):
 
         df[col] = df[col].astype(object)
+        df[col] = df[col].replace('.0','')
         return df
 
     def convert_float(self, df, col):
@@ -108,19 +110,30 @@ class transform_step:
 
         return df
 
-    def convert_all_data_type(self,df, schema):
+    def convert_all_data_type(self,df, schema, type):
 
         for col_name, data_type in zip(schema['column_name'], schema['data_type_long']):
             print(col_name)
             print(data_type)
 
-            dtype = schema.loc[schema['column_name'] == col_name.lower()]['data_type_long'].values[0]
+            if col_name != 'added_timestamp':
+                if col_name in df.columns:
 
-            print(dtype)
+                    dtype = schema.loc[schema['column_name'] == col_name.lower()]['data_type_long'].values[0]
 
-            cast_column = self.map_sql_to_numpy(dtype)
+                    print(dtype)
 
-            df = cast_column(df, col_name)
+                    cast_column = self.map_sql_to_numpy(dtype)
+
+                    df = cast_column(df, col_name)
+                else:
+                    if col_name in self.transform_map['types'][type]['nullable']:
+                        df[col_name] = None
+                    else:
+                        raise(Exception(col_name + ": Not in dataframe"))
+
+            else:
+                df['added_timestamp'] =  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         return df
 
@@ -171,7 +184,7 @@ class transform_step:
                 df = pd.concat(all_data)
                 new_cols = {col:col.lower().replace('.','_') for col in df.columns.values}
                 df = df.rename(columns = new_cols)
-                df = self.convert_all_data_type(df, schema=self.schemas[type])
+                df = self.convert_all_data_type(df, schema=self.schemas[type], type = type)
 
         else:
             all_data = []
@@ -179,19 +192,20 @@ class transform_step:
                 print(self.files.keys())
                 for file in self.files[source]:
                     df = pd.read_csv(self.config['extract']['output']['dir'] + '/' + source + '/' + file)
-                    df =self.convert_all_data_type(df, schema=self.schemas[source])
+                    df =self.convert_all_data_type(df, schema=self.schemas[source], type = type)
                     all_data.append(df)
             df = pd.concat(all_data)
 
-        df = self.filter_columns(df, type)
-        file_name = self.staging_dir + '/' + type + '.csv'
+        if os.path.isdir(self.config['extract']['output']['dir'] + '/' + source):
+            df = self.filter_columns(df, type)
+            file_name = self.staging_dir + '/' + type + '.csv'
 
-        df.to_csv(file_name,
-                  sep= '\t',
-                  index=False,
-                  encoding = 'UTF-8')
+            df.to_csv(file_name,
+                      sep= '\t',
+                      index=False,
+                      encoding = 'UTF-8')
 
-        self.staged_files[source] = file_name
+            self.staged_files[source] = file_name
 
     def run(self):
         self.get_all_files()

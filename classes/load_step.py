@@ -48,6 +48,30 @@ class load_step:
 
         self.engine.execute("REFRESH MATERIALIZED VIEW league.missing_games")
 
+    def update_control_table(self, table):
+
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        values = {"table_name":table, "ts":now}
+        query = """
+        INSERT INTO league.control_table VALUES ('{table_name}','{ts}')
+        """
+        self.engine.execute(query.format(**values))
+
+    def run_sql_statements(self):
+
+        sql_files = [self.config['sql_statements']['dir'] + '/' + file for file in self.config['sql_statements']['scripts']]
+        cursor = self.conn.cursor()
+
+        for file in sql_files:
+            fd = open(file, 'r')
+            sqlFile = fd.read()
+            fd.close()
+            sql_commands = sqlFile.split(';')
+
+            for command in sql_commands:
+                cursor.execute(command)
+
     def remove_rows_in_date_range(self, date_col, min_date, endpoint, max_date=None):
 
         if max_date is None:
@@ -61,48 +85,74 @@ class load_step:
 
         self.engine.execute(query)
 
-    def remove_rows_with_id(self, id_col, ids, endpoint):
+    def remove_overlapping_rows(self, endpoint):
 
-        cursor = self.conn.cursor()
+        table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
+        replace_vals = {
+            "table" :  table ,
+            "temp_table" : table + '_temp',
+            "id" : self.table_map['tables'][endpoint]['key']
+        }
 
-        ids = tuple(ids)
+        print(replace_vals)
 
-        replace_vals = self.table_map['tables'][endpoint] \
-            .update({'id_col': id_col})
+        query = """
+         with real_table as (
+            select {id} as id from {table}
+            ),
+            temp_table as (
+            select {id} as id from {temp_table}
+            ),
+            overlap as (
+            select distinct a.id as id from real_table a
+            left join temp_table b
+            on a.id = b.id
+            )
+         delete from {table} where {id} in (select id from overlap);
+         insert into {table} (select * from {temp_table});
+         drop table {temp_table}
+        """
 
-        query = "DELETE FROM {schema}.{table} WHERE {id_col} = %s" \
-            .format(**replace_vals)
+        print(query.format(**replace_vals))
 
-        cursor.executemany(query, ids)
-
-        self.conn.commit()
-        cursor.close()
+        self.engine.execute(query.format(**replace_vals))
 
     def copy_file_to_table(self, endpoint):
-        table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
-        print(table)
+
         cursor = self.conn.cursor()
+        table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
+        if self.config['load'][endpoint] == 'upsert':
+            self.engine.execute("DROP TABLE IF EXISTS {table}_temp; CREATE TABLE {table}_temp (LIKE {table} including all)".format(**{"table":table}))
+            table = table + '_temp'
+
+        print(table)
 
         f = open(self.files[endpoint], 'rb')
-        next(f)
+        cols = f.readline()
+        cols=str(cols).replace('\\t', ',').replace("b'", '').replace('\\n', '').replace("'", "")
         if self.table_map['tables'][endpoint]['encoding'] != 'UTF8':
             f = codecs.EncodedFile(f, "UTF8", self.table_map['tables'][endpoint]['encoding'])
+        vals = {"table": table,
+                "cols": cols}
 
         copy_sql = """
-                   COPY {} FROM stdin WITH CSV HEADER
+                   COPY {table} ({cols}) FROM stdin WITH CSV HEADER
                    DELIMITER as '\t'
-                   """.format(table)
+                   """.format(**vals)
+
+        print(copy_sql)
 
         with open(self.files[endpoint], 'r') as f:
             cursor.copy_expert(sql=copy_sql, file=f)
 
-       # cursor.copy_from(f,
-       #                  table=table, sep='\t',
-       #                  null=self.table_map['tables'][endpoint]['null_value'])
-
         self.conn.commit()
 
         cursor.close()
+
+        if self.config['load'][endpoint] == 'upsert':
+            self.remove_overlapping_rows(endpoint)
+
+        self.update_control_table(table)
 
     def run(self):
         for ep in self.config['transform']['types']:
@@ -111,8 +161,10 @@ class load_step:
 
             self.copy_file_to_table(ep)
 
+        self.run_sql_statements()
         self.refresh_missing_players()
         self.refresh_missing_games()
+
 
 
 

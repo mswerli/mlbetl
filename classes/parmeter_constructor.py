@@ -15,7 +15,6 @@ class parameter_constructor:
 
         self.output_params = []
 
-
     def create_request_params(self, params, endpoint, param_type = 'params'):
 
         ##Take a dictionary of dictironaries and generate all combinations of items
@@ -54,12 +53,12 @@ class parameter_constructor:
         ##All dates in conigs should use -. Use delim argument to replace with appropriate delim for api
 
         duration = (end - start)
+        date_pairs = []
 
         if duration > datetime.timedelta(days):
             print(duration)
 
             interval_start = start
-            date_pairs=[]
             while interval_start < end:
                 start_str =  str(interval_start).replace('-',delim)
                 end_str = str(interval_start + datetime.timedelta(days)).replace('-',delim)
@@ -67,6 +66,10 @@ class parameter_constructor:
 
                 date_pairs.append('start_date=' + start_str +'&end_date='+end_str)
                 interval_start = interval_start + datetime.timedelta(days=days+1)
+        else:
+            start_str = str(start).replace('-', delim)
+            end_str = str(end).replace('-',delim)
+            date_pairs.append('start_date=' + start_str +'&end_date='+end_str)
 
             return date_pairs
 

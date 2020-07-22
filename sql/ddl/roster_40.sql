@@ -26,5 +26,6 @@ CREATE TABLE rosters.roster_40 (
 	name_last text NULL,
 	team_id int4 NULL,
 	start_date text NULL,
-	name_full text NULL
+	name_full text NULL,
+	added_timestamp timestamp NOT NULL default NOW()
 );

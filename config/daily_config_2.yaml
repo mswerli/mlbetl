@@ -20,5 +20,9 @@ transform:
     - player
     - plays
 load:
-  player: 'truncate'
-  plays: 'truncate'
+  player: 'upsert'
+  plays: 'upsert'
+sql_statements:
+  dir: 'sql/create_tables'
+  scripts:
+    - game_events.sql
