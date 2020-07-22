@@ -5,6 +5,7 @@ tables:
     null_value: ''
     sep: ','
     encoding: 'UTF8'
+    key: team_id
   roster_40:
     schema: rosters
     table: roster_40
@@ -23,18 +24,21 @@ tables:
     null_value: ''
     sep: ','
     encoding: 'UTF8'
+    date: 'trans_date'
   player:
     schema: rosters
     table: players
     null_value: ''
     sep: ','
     encoding: 'LATIN1'
+    key: player_id
   schedule:
     schema: league
     table: schedule
     null_value: ''
     sep: ','
     encoding: 'UTF8'
+    key: gamepk
   atbat:
     schema: league
     table: play_by_play
@@ -53,3 +57,4 @@ tables:
     null_value: ''
     sep: ','
     encoding: 'LATIN1'
+    key: game_pk

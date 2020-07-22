@@ -21,8 +21,19 @@ CREATE MATERIALIZED VIEW rosters.missing_players as (
     LEFT JOIN players p
     ON r.player_id = p.player_id
     WHERE p.player_id IS NULL
+  ),
+  recent_transactions as (
+    SELECT DISTINCT
+      r.player_id
+    FROM rosters.transactions r
+    WHERE r.trans_date > CURRENT_DATE - interval '7 days'
   )
-  SELECT player_id FROM missing_from_40
-  UNION
-  SELECT player_id FROM missing_from_past
+
+  select distinct player_id from (
+	  SELECT player_id FROM missing_from_40
+	  UNION
+	  SELECT player_id FROM missing_from_past
+	  union
+	  select player_id from recent_transactions
+  ) foo
 );

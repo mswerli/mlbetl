@@ -180,7 +180,8 @@ CREATE TABLE rosters.roster_40 (
 	name_last text NULL,
 	team_id int4 NULL,
 	start_date text NULL,
-	name_full text NULL
+	name_full text NULL,
+	added_timestamp timestamp NOT NULL default NOW()
 );
 
 CREATE TABLE rosters.historical_rosters (
@@ -497,7 +498,8 @@ CREATE TABLE league.atbat (
     "matchup_postonthird_fullname" varchar(1000) NULL,
     "matchup_postonthird_link" varchar(500) NULL,
     "matchup_batterhotcoldzonestats_stats" jsonb NULL,
-    "matchup_pitcherhotcoldzonestats_stats" jsonb NULL
+    "matchup_pitcherhotcoldzonestats_stats" jsonb NULL,
+    "game_pk" float NULL
 );
 
 CREATE MATERIALIZED VIEW rosters.missing_players as (
@@ -529,11 +531,191 @@ CREATE MATERIALIZED VIEW rosters.missing_players as (
 
  CREATE MATERIALIZED VIEW league.missing_games as (
      WITH games AS (
-             SELECT DISTINCT play_by_play.game_pk
-               FROM league.play_by_play
+             SELECT DISTINCT gamepk
+               FROM league.schedule
             )
-     SELECT games.game_pk
-       FROM games
+     SELECT a.gamepk as game_pk
+       FROM games a
+       LEFT JOiN league.atbat b
+       ON a.gamepk = b.game_pk
+       WHERE b.game_pk is NULL
+
 );
+
+ create table league.control_table(
+ 	table_name varchar(100) null,
+ 	update_timestamp timestamp null
+
+ 	);
+
+CREATE TABLE league.event_details (
+	event_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	about_halfinning varchar(50) NULL,
+	about_istopinning bool NULL,
+	about_inning float8 NULL,
+	count_balls float8 NULL,
+	count_strikes float8 NULL,
+	count_outs float8 NULL,
+	matchup_batter_id float8 NULL,
+	matchup_pitcher_id float8 NULL,
+	matchup_batside_code varchar(10) NULL,
+	matchup_pitchhand_code varchar(10) NULL,
+	"index" int4 NULL,
+	pitch_index int4 NULL,
+	action_index int4 NULL,
+	runner_index int4 NULL,
+	pfxid text NULL,
+	playid text NULL,
+	pitch_number int4 NULL,
+	start_time timestamp NULL,
+	end_time timestamp NULL,
+	is_pitch bool NULL,
+	type_pitch text NULL,
+	plaey_events_count_strikes int4 NULL,
+	player_events_count_ball int4 NULL,
+	call_code json NULL,
+	call_description json NULL,
+	details_description json NULL,
+	details_code json NULL,
+	details_ball_color json NULL,
+	details_trail_color json NULL,
+	details_is_in_play json NULL,
+	details_is_strike json NULL,
+	details_is_ball json NULL
+);
+
+CREATE TABLE league.hit_data (
+	hit_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	about_halfinning varchar(50) NULL,
+	about_istopinning bool NULL,
+	about_inning float8 NULL,
+	count_balls float8 NULL,
+	count_strikes float8 NULL,
+	count_outs float8 NULL,
+	matchup_batter_id float8 NULL,
+	matchup_pitcher_id float8 NULL,
+	matchup_batside_code varchar(10) NULL,
+	matchup_pitchhand_code varchar(10) NULL,
+	"index" int4 NULL,
+	pfxid text NULL,
+	playid text NULL,
+	pitch_number int4 NULL,
+	start_time timestamp NULL,
+	end_time timestamp NULL,
+	is_pitch bool NULL,
+	type_pitch text NULL,
+	pitch_index int4 NULL,
+	action_index int4 NULL,
+	runner_index int4 NULL,
+	hit_data_launch_speed float8 NULL,
+	hit_data_launch_angle float8 NULL,
+	hit_data_total_distance float8 NULL,
+	hit_data_trajectory text NULL,
+	hit_data_hardness text NULL,
+	hit_data_location int4 NULL,
+	hit_data_coordinates_coordx float8 NULL,
+	hit_data_coordinates_coordy float8 NULL
+);
+
+CREATE TABLE league.pitch_data (
+	pitch_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	about_halfinning varchar(50) NULL,
+	about_istopinning bool NULL,
+	about_inning float8 NULL,
+	count_balls float8 NULL,
+	count_strikes float8 NULL,
+	count_outs float8 NULL,
+	matchup_batter_id float8 NULL,
+	matchup_pitcher_id float8 NULL,
+	matchup_batside_code varchar(10) NULL,
+	matchup_pitchhand_code varchar(10) NULL,
+	"index" int4 NULL,
+	pfxid text NULL,
+	playid text NULL,
+	pitch_number int4 NULL,
+	start_time timestamp NULL,
+	end_time timestamp NULL,
+	is_pitch bool NULL,
+	type_pitch text NULL,
+	pitch_index int4 NULL,
+	action_index int4 NULL,
+	runner_index int4 NULL,
+	pitch_data_start_speed float8 NULL,
+	pitch_data_end_speed float8 NULL,
+	pitch_data_strike_zone_top float8 NULL,
+	pitch_data_strike_zone_bottom float8 NULL,
+	pitch_data_coordinates_ay float8 NULL,
+	pitch_data_coordinates_az float8 NULL,
+	pitch_data_coordinates_pfxx float8 NULL,
+	pitch_data_coordinates_pfxz float8 NULL,
+	pitch_data_coordinates_px float8 NULL,
+	pitch_data_coordinates_pz float8 NULL,
+	pitch_data_coordinates_vx0 float8 NULL,
+	pitch_data_coordinates_vy0 float8 NULL,
+	pitch_data_coordinates_vz0 float8 NULL,
+	pitch_data_coordinates_x float8 NULL,
+	pitch_data_coordinates_y float8 NULL,
+	pitch_data_coordinates_x0 float8 NULL,
+	pitch_data_coordinates_y0 float8 NULL,
+	pitch_data_coordinates_z0 float8 NULL,
+	pitch_data_coordinates_ax float8 NULL,
+	pitch_data_breaks_angle float8 NULL,
+	pitch_data_breaks_length float8 NULL,
+	pitch_data_breaks_y float8 NULL,
+	pitch_data_breaks_spin_rate float8 NULL,
+	pitch_data_breaks_spin_direction float8 NULL,
+	pitch_data_zone int4 NULL,
+	pitch_data_type_confidence float8 NULL,
+	pitch_data_plate_time numeric NULL,
+	pitch_data_extension numeric NULL
+);
+
+CREATE TABLE league.runner_details (
+	runner_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	about_halfinning varchar(50) NULL,
+	about_istopinning bool NULL,
+	about_inning float8 NULL,
+	count_balls float8 NULL,
+	count_strikes float8 NULL,
+	count_outs float8 NULL,
+	matchup_batter_id float8 NULL,
+	matchup_pitcher_id float8 NULL,
+	matchup_batside_code varchar(10) NULL,
+	matchup_pitchhand_code varchar(10) NULL,
+	pitch_index int4 NULL,
+	action_index int4 NULL,
+	runner_index int4 NULL,
+	"index" int4 NULL,
+	pfxid text NULL,
+	playid text NULL,
+	pitch_number int4 NULL,
+	start_time timestamp NULL,
+	end_time timestamp NULL,
+	is_pitch bool NULL,
+	type_pitch text NULL,
+	runners_details_event text NULL,
+	runners_details_event_type text NULL,
+	runners_details_movement_reason text NULL,
+	details_runner_id int4 NULL,
+	details_runner_full_name text NULL,
+	details_runner_link text NULL,
+	pitcher int4 NULL,
+	runners_details_responsible_pitcher_link text NULL,
+	runners_details_responsible_is_scoring_event bool NULL,
+	runners_details_responsible_rbi bool NULL,
+	earned bool NULL,
+	runners_details_responsible_team_unearned bool NULL,
+	runners_details_responsible_play_index int4 NULL
+);
+
+
 
 EOSQL

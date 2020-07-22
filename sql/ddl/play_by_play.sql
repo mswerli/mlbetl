@@ -52,5 +52,6 @@ CREATE TABLE league.atbat (
     "matchup_postonthird_fullname" varchar(1000) NULL,
     "matchup_postonthird_link" varchar(500) NULL,
     "matchup_batterhotcoldzonestats_stats" jsonb NULL,
-    "matchup_pitcherhotcoldzonestats_stats" jsonb NULL
+    "matchup_pitcherhotcoldzonestats_stats" jsonb NULL,
+    "game_pk" float NULL
 );

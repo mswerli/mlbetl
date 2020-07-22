@@ -2,6 +2,7 @@ types:
   team:
     source: team
     format: json
+    nullable: []
     json_path:
       top_level:
         - team_all_season
@@ -12,6 +13,7 @@ types:
   roster_40:
     source: roster_40
     format: json
+    nullable: []
     json_path:
       top_level:
         - roster_40
@@ -22,6 +24,7 @@ types:
   roster_past:
     source: roster_past
     format: json
+    nullable: []
     json_path:
       top_level:
         - roster_team_alltime
@@ -32,6 +35,7 @@ types:
   transaction:
     source: transaction
     format: json
+    nullable: []
     json_path:
       top_level:
         - transaction_all
@@ -42,6 +46,7 @@ types:
   player:
     source: player
     format: json
+    nullable: []
     json_path:
       top_level:
         - player_info
@@ -52,9 +57,11 @@ types:
   atbat:
     source: atbat
     format: csv
+    nullable: []
   events:
     source: playbyplay
     format: json
+    nullable: []
     json_path:
       top_level:
         - allPlays
@@ -64,6 +71,7 @@ types:
   runners:
     source: playbyplay
     format: json
+    nullable: []
     json_path:
       top_level:
         - allPlays
@@ -73,6 +81,7 @@ types:
   plays:
     source: playbyplay
     format: json
+    nullable: ['pitchindex']
     json_path:
       top_level:
         - allPlays
@@ -82,6 +91,7 @@ types:
   schedule:
     source: schedule
     format: json
+    nullable: ['rescheduledate', 'rescheduledfrom','resumedate','resumedfrom']
     json_path:
       top_level:
         - dates
