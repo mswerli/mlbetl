@@ -22,4 +22,6 @@ def run_config(CONFIG, DB_CONFIG, DB_MAP):
                      db_config=DB_CONFIG)
 
 run_config(CONFIG =args.config , DB_CONFIG = args.db_config, DB_MAP=args.db_map)
+run_config(CONFIG ='config/daily_config_1.yaml' , DB_CONFIG = 'do_db.yaml', DB_MAP='global/db_config.yaml')
+
 

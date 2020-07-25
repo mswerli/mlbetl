@@ -1,8 +1,13 @@
  CREATE MATERIALIZED VIEW league.missing_games as (
      WITH games AS (
-             SELECT DISTINCT play_by_play.game_pk
-               FROM league.play_by_play
+             SELECT DISTINCT gamepk
+               FROM league.schedule
+               WHERE gametype in ('R','F','D','L','W')
             )
-     SELECT games.game_pk
-       FROM games
+     SELECT a.gamepk as game_pk
+       FROM games a
+       LEFT JOIN league.atbat b
+       ON a.gamepk = b.game_pk
+       WHERE b.game_pk is NULL
+
 );

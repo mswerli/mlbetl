@@ -87,6 +87,8 @@ class load_step:
 
     def remove_overlapping_rows(self, endpoint):
 
+        cursor = self.conn.cursor()
+
         table = self.table_map['tables'][endpoint]['schema'] + '.' + self.table_map['tables'][endpoint]['table']
         replace_vals = {
             "table" :  table ,
@@ -112,10 +114,8 @@ class load_step:
          insert into {table} (select * from {temp_table});
          drop table {temp_table}
         """
-
-        print(query.format(**replace_vals))
-
-        self.engine.execute(query.format(**replace_vals))
+        cursor.execute(query.format(**replace_vals))
+        self.conn.commit()
 
     def copy_file_to_table(self, endpoint):
 
@@ -146,7 +146,6 @@ class load_step:
             cursor.copy_expert(sql=copy_sql, file=f)
 
         self.conn.commit()
-
         cursor.close()
 
         if self.config['load'][endpoint] == 'upsert':
@@ -160,8 +159,9 @@ class load_step:
                 self.truncate_table(ep)
 
             self.copy_file_to_table(ep)
+        if 'sql_statements' in self.config.keys():
+            self.run_sql_statements()
 
-        self.run_sql_statements()
         self.refresh_missing_players()
         self.refresh_missing_games()
 
