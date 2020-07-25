@@ -127,10 +127,7 @@ class transform_step:
 
                     df = cast_column(df, col_name)
                 else:
-                    if col_name in self.transform_map['types'][type]['nullable']:
-                        df[col_name] = None
-                    else:
-                        raise(Exception(col_name + ": Not in dataframe"))
+                   df[col_name] = None
 
             else:
                 df['added_timestamp'] =  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -156,35 +153,36 @@ class transform_step:
     def collapse_files_to_csv(self, type):
         print(self.files.keys())
         source = self.transform_map['types'][type]['source']
-        if self.transform_map['types'][type]['format'] == 'json':
-            all_data = []
-            if os.path.isdir(self.config['extract']['output']['dir'] + '/' + source):
-                for file in self.files[source]:
-                    with open(self.config['extract']['output']['dir'] + '/' + source + '/' + file) as f:
-                        data = json.load(f)
-                        if 'ids' in self.transform_map['types'][type]['json_path'].keys():
-                            ids = {}
-                            for id in self.transform_map['types'][type]['json_path']['ids']:
-                                ids.update({id:data[id]})
-                        else:
-                            ids = None
-                        for a in self.transform_map['types'][type]['json_path']['top_level']:
-                            data = data[a]
-                        record_path=self.transform_map['types'][type]['json_path']['record_path'] if \
-                            self.transform_map['types'][type]['json_path']['record_path'] != 'None' else None
-                        meta_param= self.transform_map['types'][type]['json_path']['meta'] if \
-                            self.transform_map['types'][type]['json_path']['meta'] != 'None' else None
-                        data = pd.json_normalize(data, record_path=record_path, meta=meta_param)
-                        if ids is not None:
-                            for id in ids:
-                                data[id] = ids[id]
-                        all_data.append(data)
+        if len(self.files[source]) > 0:
+            if self.transform_map['types'][type]['format'] == 'json':
+                all_data = []
+                if os.path.isdir(self.config['extract']['output']['dir'] + '/' + source):
+                    for file in self.files[source]:
+                        with open(self.config['extract']['output']['dir'] + '/' + source + '/' + file) as f:
+                            data = json.load(f)
+                            if 'ids' in self.transform_map['types'][type]['json_path'].keys():
+                                ids = {}
+                                for id in self.transform_map['types'][type]['json_path']['ids']:
+                                    ids.update({id:data[id]})
+                            else:
+                                ids = None
+                            for a in self.transform_map['types'][type]['json_path']['top_level']:
+                                data = data[a]
+                            record_path=self.transform_map['types'][type]['json_path']['record_path'] if \
+                                self.transform_map['types'][type]['json_path']['record_path'] != 'None' else None
+                            meta_param= self.transform_map['types'][type]['json_path']['meta'] if \
+                                self.transform_map['types'][type]['json_path']['meta'] != 'None' else None
+                            data = pd.json_normalize(data, record_path=record_path, meta=meta_param)
+                            if ids is not None:
+                                for id in ids:
+                                    data[id] = ids[id]
+                            all_data.append(data)
 
-                #dfs = [pd.json_normalize(item) for item in all_data]
-                df = pd.concat(all_data)
-                new_cols = {col:col.lower().replace('.','_') for col in df.columns.values}
-                df = df.rename(columns = new_cols)
-                df = self.convert_all_data_type(df, schema=self.schemas[type], type = type)
+                    #dfs = [pd.json_normalize(item) for item in all_data]
+                    df = pd.concat(all_data)
+                    new_cols = {col:col.lower().replace('.','_') for col in df.columns.values}
+                    df = df.rename(columns = new_cols)
+                    df = self.convert_all_data_type(df, schema=self.schemas[type], type = type)
 
         else:
             all_data = []

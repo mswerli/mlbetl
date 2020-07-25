@@ -211,7 +211,7 @@ on a.hit_id = b.hit_id
 where a.hit_id is not null and b.hit_id is NULL
 );
 
-insert into league.hit_data (
+insert into league.runner_credits (
 with existing_ids as (
 	select distinct runner_id from league.runner_credits
 	),
@@ -252,8 +252,8 @@ with existing_ids as (
 	)
 select a.* from new_data a
 left join existing_ids b
-on a._id = b.hit_id
-where a.hit_id is not null and b.hit_id is NULL
+on a.runner_id = b.runner_id
+where a.runner_id is not null and b.runner_id is NULL
 
 );
 
@@ -318,6 +318,6 @@ from league.atbat a
 left join existing_ids b
 on a.game_pk || '_' || '_' || atbatindex = b.matchup_id
 where b.matchup_id is NULL
-);
+)
 
 
