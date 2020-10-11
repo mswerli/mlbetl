@@ -70,6 +70,7 @@ class load_step:
             sql_commands = sqlFile.split(';')
 
             for command in sql_commands:
+                print(command)
                 cursor.execute(command)
 
     def remove_rows_in_date_range(self, date_col, min_date, endpoint, max_date=None):

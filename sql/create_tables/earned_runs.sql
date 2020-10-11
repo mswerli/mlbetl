@@ -5,7 +5,7 @@ select
 	pitcher,
 	about_inning ,
 	about_halfinning ,
-	sum(earned::int)
+	sum(earned::int) as earned_runs
 from league.runner_details
 where pitcher is not null
 group by 	game_pk,

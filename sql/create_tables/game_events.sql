@@ -8,7 +8,7 @@ with existing_ids as (
 			game_pk,
 			atbatindex,
 			about_halfinning ,
-			about_istopinning ,
+			about_istopinning::boolean ,
 			about_inning,
 			count_balls,
 			count_strikes,
@@ -59,7 +59,7 @@ with existing_ids as (
 		game_pk,
 		atbatindex,
 		about_halfinning ,
-		about_istopinning ,
+		about_istopinning::boolean ,
 		about_inning,
 		count_balls,
 		count_strikes,
@@ -109,7 +109,7 @@ with existing_ids as (
 		game_pk,
 		atbatindex,
 		about_halfinning ,
-		about_istopinning ,
+		about_istopinning::boolean ,
 		about_inning,
 		count_balls,
 		count_strikes,
@@ -175,7 +175,7 @@ with existing_ids as (
 			game_pk,
 			atbatindex,
 			about_halfinning ,
-			about_istopinning ,
+			about_istopinning::boolean ,
 			about_inning,
 			count_balls,
 			count_strikes,
@@ -221,7 +221,7 @@ with existing_ids as (
 		game_pk,
 		atbatindex,
 		about_halfinning ,
-		about_istopinning ,
+		about_istopinning::boolean ,
 		about_inning,
 		count_balls,
 		count_strikes,
@@ -283,7 +283,7 @@ select distinct
 	about_inning ,
 	about_iscomplete ,
 	about_isscoringplay ,
-	about_istopinning ,
+	about_istopinning::boolean ,
 	about_starttime ,
 	count_balls ,
 	count_strikes ,
@@ -318,6 +318,36 @@ from league.atbat a
 left join existing_ids b
 on a.game_pk || '_' || '_' || atbatindex = b.matchup_id
 where b.matchup_id is NULL
+);
+
+insert into league.earned_runs (
+with existing_ids as (
+	select distinct matchup_id from league.earned_runs a
+	),
+	new_data as (
+    select
+		game_pk || '_' || atbatindex as matchup_id,
+		game_pk,
+		atbatindex ,
+		matchup_batside_code,
+		pitcher,
+		matchup_batter_id as batter,
+		about_inning ,
+		about_halfinning ,
+		sum(earned::int) as earned_runs
+	from league.runner_details  a
+	where pitcher is not null
+	group by 	game_pk,
+		matchup_batside_code,
+		atbatindex ,
+		pitcher,
+		matchup_batter_id ,
+		about_inning ,
+		about_halfinning
+	)
+	select a.* from new_data a
+	left join existing_ids b
+	on a.matchup_id = b.matchup_id
 )
 
 
