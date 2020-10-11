@@ -227,7 +227,7 @@ CREATE TABLE league.schedule (
 	seasondisplay int4 NULL,
 	daynight varchar(8) NULL,
 	scheduledinnings int4 NULL,
-	inningbreaklength int4 NULL,
+	inningbreaklength float8 NULL,
 	gamesinseries float8 NULL,
 	seriesgamenumber float8 NULL,
 	seriesdescription varchar(200) NULL,
@@ -531,7 +531,7 @@ CREATE MATERIALIZED VIEW rosters.missing_players as (
 
  CREATE MATERIALIZED VIEW league.missing_games as (
      WITH games AS (
-             SELECT DISTINCT gamepk
+             SELECT DISTINCT gamepk, gamedate
                FROM league.schedule
                WHERE gametype in ('R','F','D','L','W')
             )
@@ -539,7 +539,7 @@ CREATE MATERIALIZED VIEW rosters.missing_players as (
        FROM games a
        LEFT JOIN league.atbat b
        ON a.gamepk = b.game_pk
-       WHERE b.game_pk is NULL
+       WHERE b.game_pk is NULL and a.gamedate::date < CURRENT_DATE
 
 );
 
@@ -715,6 +715,70 @@ CREATE TABLE league.runner_details (
 	earned bool NULL,
 	runners_details_responsible_team_unearned bool NULL,
 	runners_details_responsible_play_index int4 NULL
+);
+
+CREATE TABLE league.matchups (
+	matchup_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	result_type varchar(100) NULL,
+	playendtime timestamp NULL,
+	result_event varchar(500) NULL,
+	result_eventtype varchar(100) NULL,
+	result_description text NULL,
+	result_rbi float8 NULL,
+	result_homescore float8 NULL,
+	about_atbatindex float8 NULL,
+	about_captivatingindex float8 NULL,
+	about_endtime timestamp NULL,
+	about_halfinning varchar(50) NULL,
+	about_hasout bool NULL,
+	about_hasreview bool NULL,
+	about_inning float8 NULL,
+	about_iscomplete bool NULL,
+	about_isscoringplay bool NULL,
+	about_istopinning bool NULL,
+	about_starttime timestamp NULL,
+	count_balls float8 NULL,
+	count_strikes float8 NULL,
+	count_outs float8 NULL,
+	matchup_batside_code varchar(10) NULL,
+	matchup_batside_description varchar(10) NULL,
+	matchup_batter_fullname varchar(500) NULL,
+	matchup_batter_id float8 NULL,
+	matchup_batter_link varchar(500) NULL,
+	matchup_batterhotcoldzones text NULL,
+	matchup_batterhotcoldzonestats_stats jsonb NULL,
+	matchup_pitcher_fullname varchar(1000) NULL,
+	matchup_pitcher_id float8 NULL,
+	matchup_pitcher_link varchar(100) NULL,
+	matchup_pitcherhotcoldzones text NULL,
+	matchup_pitcherhotcoldzonestats_stats jsonb NULL,
+	matchup_pitchhand_code varchar(10) NULL,
+	matchup_pitchhand_description varchar(10) NULL,
+	matchup_postonfirst_fullname varchar(1000) NULL,
+	matchup_postonfirst_id float8 NULL,
+	matchup_postonfirst_link varchar(500) NULL,
+	matchup_postonsecond_fullname varchar(1000) NULL,
+	matchup_postonsecond_id float8 NULL,
+	matchup_postonsecond_link varchar(500) NULL,
+	matchup_postonthird_fullname varchar(1000) NULL,
+	matchup_postonthird_id float8 NULL,
+	matchup_postonthird_link varchar(500) NULL,
+	matchup_splits_batter varchar(10) NULL,
+	matchup_splits_menonbase varchar(50) NULL,
+	matchup_splits_pitcher varchar(10) NULL
+);
+CREATE TABLE league.earned_runs (
+	matchup_id text NULL,
+	game_pk float8 NULL,
+	atbatindex text NULL,
+	matchup_batside_code varchar(10) NULL,
+	pitcher int4 NULL,
+	batter float8 NULL,
+	about_inning float8 NULL,
+	about_halfinning varchar(50) NULL,
+	earned_runs int8 NULL
 );
 
 

@@ -1,6 +1,7 @@
 import yaml
 import itertools
 import datetime
+from datetime import timedelta
 
 
 class parameter_constructor:
@@ -55,23 +56,23 @@ class parameter_constructor:
         duration = (end - start)
         date_pairs = []
 
-        if duration > datetime.timedelta(days):
+        if duration > timedelta(days):
             print(duration)
 
             interval_start = start
             while interval_start < end:
                 start_str =  str(interval_start).replace('-',delim)
-                end_str = str(interval_start + datetime.timedelta(days)).replace('-',delim)
+                end_str = str(interval_start + timedelta(days)).replace('-',delim)
 
 
                 date_pairs.append('start_date=' + start_str +'&end_date='+end_str)
-                interval_start = interval_start + datetime.timedelta(days=days+1)
+                interval_start = interval_start + timedelta(days=days+1)
         else:
             start_str = str(start).replace('-', delim)
             end_str = str(end).replace('-',delim)
             date_pairs.append('start_date=' + start_str +'&end_date='+end_str)
 
-            return date_pairs
+        return date_pairs
 
     def build_date_range(self, start, end, delim):
 

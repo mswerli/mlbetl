@@ -22,9 +22,9 @@ extract:
         end_season: 2020
     schedule:
       params:
-        season: [2020]
-        startDate: 2019-03-01
-        endDate: 2019-11-01
+        season: [2017,2018, 2019,2020]
+        startDate: 2017-03-01
+        endDate: 2020-11-01
       ##Players to get. If all, will get player ids from rosters tables that aren't in players table
   output:
     dir: temp_data/
